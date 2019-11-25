@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --require test/setup.js",
+    "migrate": "postgrator --config postgrator-config.js",
+    "migrate-test": "env NODE_ENV=test npm run migrate",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "predeploy": "npm audit",
@@ -20,12 +22,16 @@
     "express": "^4.17.1",
     "helmet": "^3.21.2",
     "jsonwebtoken": "^8.5.1",
-    "morgan": "^1.9.1"
+    "knex": "^0.20.2",
+    "morgan": "^1.9.1",
+    "pg": "^7.14.0",
+    "xss": "^1.0.6"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^6.2.0",
     "nodemon": "^1.19.2",
+    "postgrator-cli": "^3.3.0",
     "supertest": "^4.0.2"
   }
 }
