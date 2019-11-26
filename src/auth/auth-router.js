@@ -19,7 +19,7 @@ authRouter
         });
 
     try {
-      const dbUser = AuthService.getUserWithUserName(
+      const dbUser = await AuthService.getUserWithUserName(
         req.app.get('db'),
         loginUser.username,
       );
