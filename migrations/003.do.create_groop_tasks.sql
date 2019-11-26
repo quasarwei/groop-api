@@ -5,9 +5,9 @@ CREATE TABLE groop_tasks (
   completed BOOLEAN DEFAULT false NOT NULL,
   creator_id INTEGER 
     REFERENCES groop_users(id) ON DELETE CASCADE NOT NULL,
-  date_due DATE NOT NULL
+  date_due DATE NOT NULL,
   user_assigned_id INTEGER
-    REFERENCES groop_users(id) ON DELETE CASCADE NOT NULL
+    REFERENCES groop_users(id) ON DELETE CASCADE,
   groop_id INTEGER
     REFERENCES groop_groups(id) ON DELETE CASCADE NOT NULL
 );
