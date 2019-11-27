@@ -2,13 +2,15 @@ const express = require('express');
 const xss = require('xss');
 const GroupService = require('./groups-service');
 
+groupsRouter = express.Router();
+
 const groupFormat = group => ({
     id: group.id,
     name: xss(group.name),
     owner_id: group.owner_id
 });
 
-groupsRouter.post(':/groups', jsonParser, async (req, res, next)=> {
+groupsRouter.post(':/groups', async (req, res, next)=> {
     const { name, owner_id } = req.body;
 
     for (const field of ['name', 'owner_id'])
