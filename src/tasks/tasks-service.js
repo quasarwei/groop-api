@@ -1,5 +1,5 @@
 const TasksService = {
-  postNewTask(knex, newTopicInfo) {
+  postNewTask(knex, newTaskInfo) {
     return knex('groop_tasks')
       .insert(newTaskInfo)
       .returning('*')
