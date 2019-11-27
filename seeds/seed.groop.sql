@@ -16,7 +16,7 @@ VALUES
 
 INSERT INTO groop_groups (name, owner_id)
 VALUES
-    ('group1', 1 ),
+    ('group1', 1),
     ('group2', 3),
     ('group3', 4);
 
@@ -37,7 +37,7 @@ INSERT INTO groop_tasks (name, description, creator_id, date_due, user_assigned_
 VALUES 
     ('buy milk', 'get 3 gallons', 3, '12/01/2019', 1, 1),
     ('rake leaves', 'urgent: last pickup coming up', 1, '12/02/2019', 1, 1),
-    ('doctor appointment', 'Suzy, 3pm, at other clinic', 3, '12/01/2019', 3, 2),
+    ('doctor appointment', 'Suzy, 3pm, at other clinic', 3, '12/01/2019', 3, 3),
     ('buy snowblower', 'Toro brand', 4, '12/02/2019', 2, 2);
 
 COMMIT;
