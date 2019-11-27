@@ -22,13 +22,13 @@ VALUES
   ('username5', 'first5 last5', 'password', 'user5@email.com'),
   ('username6', 'first6 last6', 'password', 'user6@email.com');
 
-INSERT INTO groop_groups ('name', 'owner_id', 'members')
+INSERT INTO groop_groups (name, owner_id, members)
 VALUES
-    ('group1', 1, [1, 3, 5]),
-    ('group2', 3, [3, 4, 5, 6]),
-    ('group3', 4, [1, 2, 3, 4, 5, 6]);
+    ('group1', 1, '[1, 3, 5]'),
+    ('group2', 3, '[3, 4, 5, 6]'),
+    ('group3', 4, '[1, 2, 3, 4, 5, 6]');
 
-INSERT INTO groop_tasks (name, description, completed, creator_id, date_due, user_assigned_id, groop_id)
+INSERT INTO groop_tasks (name, description, completed, creator_id, date_due, user_assigned_id, group_id)
 VALUES 
     ('buy milk', 'get 3 gallons', false, 3, '12/01/2019', 0, 1),
     ('rake leaves', 'urgent: last pickup coming up', false, 1, '12/02/2019', 0, 1),
