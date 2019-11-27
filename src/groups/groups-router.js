@@ -1,9 +1,10 @@
 const express = require('express');
-const xss = require('xss');
 const path = require('path');
+const xss = require('xss');
 const GroupService = require('./groups-service');
 
 groupsRouter = express.Router();
+const jsonParser = express.json();
 
 const groupFormat = group => ({
   id: group.id,
@@ -11,7 +12,7 @@ const groupFormat = group => ({
   owner_id: group.owner_id,
 });
 
-groupsRouter.post('/', async (req, res, next) => {
+groupsRouter.post('/', jsonParser, async (req, res, next) => {
   const { name, owner_id } = req.body;
 
   for (const field of ['name', 'owner_id'])
@@ -28,7 +29,7 @@ groupsRouter.post('/', async (req, res, next) => {
     );
     res
       .status(201)
-      .location(path.posix.join(req.originUrl, `/${newGroup.id}`))
+      .location(path.posix.join(req.originalUrl, `/${newGroup.id}`))
       .json(groupFormat(newGroup));
   } catch (error) {
     next(error);
