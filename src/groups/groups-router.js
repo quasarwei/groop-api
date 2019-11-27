@@ -1,6 +1,6 @@
 const express = require('express');
 const xss = require('xss');
-
+const GroupService = require('./groups-service');
 
 const groupFormat = group => ({
     id: group.id,
