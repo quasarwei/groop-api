@@ -8,7 +8,7 @@ const groupFormat = group => ({
     owner_id: group.owner_id
 });
 
-groupsRouter.post(':/group', jsonParser, async (req, res, next)=> {
+groupsRouter.post(':/groups', jsonParser, async (req, res, next)=> {
     const { name, owner_id } = req.body;
 
     for (const field of ['name', 'owner_id'])
