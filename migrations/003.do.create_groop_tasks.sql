@@ -8,7 +8,7 @@ CREATE TABLE groop_tasks (
   date_due DATE NOT NULL,
   user_assigned_id INTEGER
     REFERENCES groop_users(id) ON DELETE CASCADE,
-  groop_id INTEGER
+  group_id INTEGER
     REFERENCES groop_groups(id) ON DELETE CASCADE NOT NULL
 );
    

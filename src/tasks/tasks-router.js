@@ -17,15 +17,15 @@ const taskFormat = task => ({
 });
 
 tasksRouter.post('/:groupId', jsonParser, async (req, res, next) => {
-  const { name, description, creator_id, due_date, group_id} = req.body;
+  const { name, description, creator_id, date_due, group_id} = req.body;
 
-  for (const field of ['name', 'description', 'creator_id', 'due_date', 'group_id'])
+  for (const field of ['name', 'description', 'creator_id', 'date_due', 'group_id'])
     if (!req.body[field])
       return res.status(400).json({
         error: `Missing '${field}' in request body`,
       });
   
-  const newTaskInfo = {name, description, creator_id, due_date, group_id};
+  const newTaskInfo = {name, description, creator_id, date_due, group_id};
   try {
     const newTask = await TasksService.postNewTask(req.app.get('db'), newTaskInfo);
     res.status(201)

@@ -3,6 +3,7 @@ const TasksService = {
     return knex('groop_tasks')
       .insert(newTaskInfo)
       .returning('*')
-      .then(rows => {return rows[0]});
+      .then(rows => {return rows[0];} );
   }
 };
+module.exports = TasksService;
