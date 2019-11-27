@@ -7,28 +7,27 @@ const { NODE_ENV } = require('./config');
 
 const authRouter = require('./auth/auth-router');
 const usersRouter = require('./users/users-router');
+const groupsRouter = require('./groups/groups-router');
 const tasksRouter = require('./tasks/tasks-router');
 
 const app = express();
 
-const morganOption = (NODE_ENV === 'production')
-  ? 'tiny'
-  : 'common';
+const morganOption = NODE_ENV === 'production' ? 'tiny' : 'common';
 
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 
-
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/groups', groupsRouter);
 app.use('/api/tasks', tasksRouter);
 
-
-app.use(function errorHandler(error, req, res, next) { //eslint-disable-line no-unused-vars
+app.use(function errorHandler(error, req, res, next) {
+  //eslint-disable-line no-unused-vars
   let response;
   if (NODE_ENV === 'production') {
-    response = { error: { message: 'server error' }};
+    response = { error: { message: 'server error' } };
   } else {
     console.error(error);
     response = { message: error.message, error };
