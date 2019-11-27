@@ -7,8 +7,7 @@ const { NODE_ENV } = require('./config');
 
 const authRouter = require('./auth/auth-router');
 const usersRouter = require('./users/users-router');
-const groupsRouter = require('./groups/groups-router');
-
+const tasksRouter = require('./tasks/tasks-router');
 
 const app = express();
 
@@ -23,7 +22,7 @@ app.use(cors());
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
-app.use('/api/groups', groupsRouter);
+app.use('/api/tasks', tasksRouter);
 
 
 app.use(function errorHandler(error, req, res, next) { //eslint-disable-line no-unused-vars
