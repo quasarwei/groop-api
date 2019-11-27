@@ -1,7 +1,8 @@
 const express = require('express');
 const path = require('path');
 const xss = require('xss');
-const GroupService = require('./groups-service');
+const GroupsService = require('./groups-service');
+const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
 
 groupsRouter = express.Router();
 const jsonParser = express.json();
@@ -23,10 +24,17 @@ groupsRouter.post('/', jsonParser, async (req, res, next) => {
 
   const newGroupInfo = { name, owner_id };
   try {
-    const newGroup = await GroupService.postNewGroup(
+    const newGroup = await GroupsService.postNewGroup(
       req.app.get('db'),
       newGroupInfo,
     );
+
+    const groupLink = await GroupsMembersService.addGroupMember(
+      req.app.get('db'),
+      newGroup.id,
+      newGroup.owner_id,
+    );
+
     res
       .status(201)
       .location(path.posix.join(req.originalUrl, `/${newGroup.id}`))
