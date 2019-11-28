@@ -1,26 +1,102 @@
-# Express Boilerplate!
+# Groop Server
 
 This is a boilerplate project used for starting new projects!
 
-## Set up
+## API Endpoints
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+### Overview
 
-1. Clone this repository to your local machine `git clone BOILERPLATE-URL NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+| Method | Endpoint                                                | Usage                    | Returns     |
+| ------ | ------------------------------------------------------- | ------------------------ | ----------- |
+| POST   | [/api/auth/token](#apiauthtoken)                        | Authenticate a user      | JWT         |
+| PUT    | [/api/auth/token](#apiauthtoken)                        | Re-authenticate a user   | JWT         |
+| POST   | [/api/user](#apiuser)                                   | Register a new user      | User Object |
+| POST   | [/api/tasks](#POSTapitasks)                             | Create a new task        | Object      |
+| GET    | [/api/tasks/:group_id](#GETapitasks:group_id)           | Get all tasks in a group | Object      |
+| PATCH  | [/api/tasks/task/:task_id](#PATCHapitaskstask:task_id)  | Edit a task              | Object      |
+| DELETE | [/api/tasks/task/:task_id](#DELETEapitaskstask:task_id) | Delete a task            | -           |
+| POST   | [/api/groups](#POSTapigroups)                           | Create a group           | Object      |
+| POST   | [/api/groupsmembers](#POSTapigroupsmembers)             | Add a user to a group    | Object      |
 
-## Scripts
+#### `POST /api/tasks`
 
-Start the application `npm start`
+##### Request Body
 
-Start nodemon for the application `npm run dev`
+| Fields      | Type   | Description                        |
+| ----------- | ------ | ---------------------------------- |
+| name        | String | Name of task                       |
+| description | String | Description of task                |
+| creator_id  | Int    | creator's user id                  |
+| date_due    | String | Date task is to be completed by    |
+| group_id    | Int    | group id task is to be created for |
 
-Run the tests `npm test`
+##### OK Response Body
 
-## Deploying
+| Fields           | Type   | Description                                 |
+| ---------------- | ------ | ------------------------------------------- |
+| id               | Int    | task id                                     |
+| name             | String | Name of task                                |
+| description      | String | Description of task                         |
+| completed        | Bool   | Defaults to false                           |
+| creator_id       | Int    | creator's user id                           |
+| date_due         | String | Date task is to be completed by             |
+| user_assigned_id | Int    | task's assignee's user id, defaults to null |
+| group_id         | Int    | group id task was created for               |
 
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.
+#### `GET /api/tasks/:group_id`
+
+##### Path Parameter
+
+| Path parameter | Description |
+| -------------- | ----------- |
+| group_id       | group id    |
+
+##### OK Response Body
+
+| Type  | Description                                 |
+| ----- | ------------------------------------------- |
+| Array | An array of task objects belonging to group |
+
+#### `PATCH /api/tasks/task/:task_id`
+
+##### Path Parameter
+
+| Path parameter | Description     |
+| -------------- | --------------- |
+| task_id        | task id to edit |
+
+##### Request Body
+
+Body must include at least one item to edit:
+
+| Fields           | Type   | Description                     |
+| ---------------- | ------ | ------------------------------- |
+| name             | String | Name of task                    |
+| description      | String | Description of task             |
+| date_due         | String | Date task is to be completed by |
+| completed        | Bool   | Completion status               |
+| user_assigned_id | Int    | Id of user to assign task to    |
+
+##### OK Response Body
+
+| Type        | Description                    |
+| ----------- | ------------------------------ |
+| Task Object | Task object with edited values |
+
+#### `DELETE /api/tasks/task/:task_id`
+
+##### Path Parameter
+
+| Path parameter | Description       |
+| -------------- | ----------------- |
+| task_id        | task id to delete |
+
+##### Responses
+
+| Code | Description |
+| ---- | ----------- |
+| 204  | No Content  |
+
+#### `POST /api/groups`
+
+#### `POST /api/groupsmembers`
