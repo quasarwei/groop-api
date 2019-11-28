@@ -31,4 +31,33 @@ groupsMembersRouter.post('/', jsonParser, async (req, res, next) => {
   }
 });
 
+groupsMembersRouter.get('/:group_id', async (req, res, next) => {
+  const { group_id } = req.params;
+  try {
+    const groupMembers = await GroupsMembersService.getGroupMembers(
+      req.app.get('db'),
+      group_id,
+    );
+
+    res.status(200).json(groupMembers);
+  } catch (error) {
+    next(error);
+  }
+});
+
+groupsMembersRouter.delete('/:group_id/:member_id', async (req, res, next) => {
+  const { group_id, member_id } = req.params;
+
+  try {
+    const deletedMember = await GroupsMembersService.deleteGroupMember(
+      req.app.get('db'),
+      group_id,
+      member_id,
+    );
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = groupsMembersRouter;
