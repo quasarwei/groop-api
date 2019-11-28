@@ -11,12 +11,12 @@ This is a boilerplate project used for starting new projects!
 | POST   | [/api/auth/token](#apiauthtoken)                        | Authenticate a user      | JWT         |
 | PUT    | [/api/auth/token](#apiauthtoken)                        | Re-authenticate a user   | JWT         |
 | POST   | [/api/user](#apiuser)                                   | Register a new user      | User Object |
-| POST   | [/api/tasks](#POSTapitasks)                             | Create a new task        | Object      |
-| GET    | [/api/tasks/:group_id](#GETapitasks:group_id)           | Get all tasks in a group | Object      |
-| PATCH  | [/api/tasks/task/:task_id](#PATCHapitaskstask:task_id)  | Edit a task              | Object      |
-| DELETE | [/api/tasks/task/:task_id](#DELETEapitaskstask:task_id) | Delete a task            | -           |
-| POST   | [/api/groups](#POSTapigroups)                           | Create a group           | Object      |
-| POST   | [/api/groupsmembers](#POSTapigroupsmembers)             | Add a user to a group    | Object      |
+| POST   | [/api/tasks](#post-apitasks)                             | Create a new task        | Object      |
+| GET    | [/api/tasks/:group_id](#get-apitasksgroup_id)           | Get all tasks in a group | Object      |
+| PATCH  | [/api/tasks/task/:task_id](#patch-apitaskstasktask_id)  | Edit a task              | Object      |
+| DELETE | [/api/tasks/task/:task_id](#delete-apitaskstasktask_id) | Delete a task            | -           |
+| POST   | [/api/groups](#post-apigroups)                           | Create a group           | Object      |
+| POST   | [/api/groupsmembers](#post-apigroupsmembers)             | Add a user to a group    | Object      |
 
 #### `POST /api/tasks`
 
