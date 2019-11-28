@@ -6,6 +6,7 @@ const TasksService = require('./tasks-service.js');
 const tasksRouter = express.Router();
 const jsonParser = express.json();
 
+// todo: check if task exists if deleting,patching
 const taskFormat = task => ({
   id: task.id,
   name: xss(task.name),
@@ -84,13 +85,11 @@ tasksRouter.patch('/task/:task_id', jsonParser, async (req, res, next) => {
 
   const numberOfValues = Object.values(updateInfo).filter(Boolean).length;
   if (numberOfValues == 0) {
-    return res
-      .status(400)
-      .json({
-        error: {
-          message: `Request must include at least one item to edit: name, description, date_due, completed, or user_assigned_id`,
-        },
-      });
+    return res.status(400).json({
+      error: {
+        message: `Request must include at least one item to edit: name, description, date_due, completed, or user_assigned_id`,
+      },
+    });
   }
 
   try {

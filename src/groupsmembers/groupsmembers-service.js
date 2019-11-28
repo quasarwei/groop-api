@@ -10,5 +10,10 @@ const GroupsMembersService = {
       .where({ group_id, member_id })
       .delete();
   },
+  getGroupMembers(knex, group_id) {
+    return knex('groop_groups_members')
+      .select('*')
+      .where({ group_id });
+  },
 };
 module.exports = GroupsMembersService;

@@ -1,22 +1,23 @@
 # Groop Server
 
-This is a boilerplate project used for starting new projects!
-
 ## API Endpoints
 
 ### Overview
 
-| Method | Endpoint                                                | Usage                    | Returns     |
-| ------ | ------------------------------------------------------- | ------------------------ | ----------- |
-| POST   | [/api/auth/token](#apiauthtoken)                        | Authenticate a user      | JWT         |
-| PUT    | [/api/auth/token](#apiauthtoken)                        | Re-authenticate a user   | JWT         |
-| POST   | [/api/user](#apiuser)                                   | Register a new user      | User Object |
-| POST   | [/api/tasks](#post-apitasks)                             | Create a new task        | Object      |
-| GET    | [/api/tasks/:group_id](#get-apitasksgroup_id)           | Get all tasks in a group | Object      |
-| PATCH  | [/api/tasks/task/:task_id](#patch-apitaskstasktask_id)  | Edit a task              | Object      |
-| DELETE | [/api/tasks/task/:task_id](#delete-apitaskstasktask_id) | Delete a task            | -           |
-| POST   | [/api/groups](#post-apigroups)                           | Create a group           | Object      |
-| POST   | [/api/groupsmembers](#post-apigroupsmembers)             | Add a user to a group    | Object      |
+| Method | Endpoint                                                                             | Usage                      | Returns            |
+| ------ | ------------------------------------------------------------------------------------ | -------------------------- | ------------------ |
+| POST   | [/api/auth/token](#apiauthtoken)                                                     | Authenticate a user        | JWT                |
+| PUT    | [/api/auth/token](#apiauthtoken)                                                     | Re-authenticate a user     | JWT                |
+| POST   | [/api/user](#apiuser)                                                                | Register a new user        | User Object        |
+| POST   | [/api/tasks](#post-apitasks)                                                         | Create a new task          | New Task Object    |
+| GET    | [/api/tasks/:group_id](#get-apitasksgroup_id)                                        | Get all tasks in a group   | Array of tasks     |
+| PATCH  | [/api/tasks/task/:task_id](#patch-apitaskstasktask_id)                               | Edit a task                | Edited Task Object |
+| DELETE | [/api/tasks/task/:task_id](#delete-apitaskstasktask_id)                              | Delete a task              | -                  |
+| POST   | [/api/groups](#post-apigroups)                                                       | Create a group             | Object             |
+| DELETE | [/api/groups/:group_id](#delete-apigroupsgroup_id)                                   | Delete a group             | -                  |
+| POST   | [/api/groupsmembers](#post-apigroupsmembers)                                         | Add a user to a group      | Object             |
+| GET    | [/api/groupsmembers/:group_id](#get-apigroupsmembersgroup_id)                        | Get all users in a group   |                    |
+| DELETE | [/api/groupsmembers/:group_id/:member_id](#delete-apigroupsmembersgroup_idmember_id) | Remove a user from a group | -                  |
 
 #### `POST /api/tasks`
 
@@ -99,4 +100,10 @@ Body must include at least one item to edit:
 
 #### `POST /api/groups`
 
+#### `DELETE /api/groups/:group_id`
+
 #### `POST /api/groupsmembers`
+
+#### `GET /api/groupsmembers/:group_id`
+
+#### `DELETE /api/groupsmembers/:group_id/:member_id`

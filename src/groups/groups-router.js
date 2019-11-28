@@ -44,4 +44,18 @@ groupsRouter.post('/', jsonParser, async (req, res, next) => {
   }
 });
 
+groupsRouter.delete('/:group_id', async (req, res, next) => {
+  const { group_id } = req.params;
+
+  try {
+    const deletedGroup = await GroupsService.deleteGroup(
+      req.app.get('db'),
+      group_id,
+    );
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = groupsRouter;
