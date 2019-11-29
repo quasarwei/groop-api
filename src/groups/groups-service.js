@@ -12,5 +12,11 @@ const GroupsService = {
       .where({ id })
       .delete();
   },
+  getGroupById(knex, id) {
+    return knex('groop_groups')
+      .select('*')
+      .where({ id })
+      .first();
+  },
 };
 module.exports = GroupsService;

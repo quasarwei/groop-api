@@ -5,8 +5,8 @@ const TasksService = require('./tasks-service.js');
 
 const tasksRouter = express.Router();
 const jsonParser = express.json();
+const { requireAuth } = require('../middleware/jwt-auth');
 
-// todo: check if task exists if deleting,patching
 const taskFormat = task => ({
   id: task.id,
   name: xss(task.name),
@@ -18,17 +18,22 @@ const taskFormat = task => ({
   group_id: task.group_id,
 });
 
-tasksRouter.get('/', async (req, res, next) => {
+// get all tasks that authorized user is assigned to
+tasksRouter.get('/', requireAuth, async (req, res, next) => {
   try {
-    const tasks = await TasksService.getAllTasks(req.app.get('db'));
-    const allTasks = tasks.map(taskFormat);
-    res.status(200).json(allTasks);
+    const userTasks = await TasksService.getTasksByAssignee(
+      req.app.get('db'),
+      req.user.id,
+    );
+    const userTasksSanitized = userTasks.map(taskFormat);
+    res.status(200).json(userTasksSanitized);
   } catch (error) {
     next(error);
   }
 });
 
-tasksRouter.get('/:group_id', async (req, res, next) => {
+// todo: prevent user from getting tasks in a group they are not a part of
+tasksRouter.get('/:group_id', requireAuth, async (req, res, next) => {
   const { group_id } = req.params;
   try {
     const groupTasks = await TasksService.getGroupTasks(
@@ -42,21 +47,16 @@ tasksRouter.get('/:group_id', async (req, res, next) => {
   }
 });
 
-tasksRouter.post('/', jsonParser, async (req, res, next) => {
-  const { name, description, creator_id, date_due, group_id } = req.body;
+tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
+  const { name, description, date_due, group_id } = req.body;
 
-  for (const field of [
-    'name',
-    'description',
-    'creator_id',
-    'date_due',
-    'group_id',
-  ])
+  for (const field of ['name', 'description', 'date_due', 'group_id'])
     if (!req.body[field])
       return res.status(400).json({
         error: `Missing '${field}' in request body`,
       });
 
+  const creator_id = req.user.id;
   const newTaskInfo = { name, description, creator_id, date_due, group_id };
   try {
     const newTask = await TasksService.postNewTask(
@@ -72,50 +72,79 @@ tasksRouter.post('/', jsonParser, async (req, res, next) => {
   }
 });
 
-tasksRouter.patch('/task/:task_id', jsonParser, async (req, res, next) => {
-  const { task_id } = req.params;
-  const { name, description, date_due, completed, user_assigned_id } = req.body;
-  const updateInfo = {
-    name,
-    description,
-    date_due,
-    completed,
-    user_assigned_id,
-  };
+tasksRouter
+  .route('/task/:task_id')
+  .all(requireAuth)
+  .all(checkTaskExists)
+  // fix patch and delete so user can only edit and delete tasks in a group that they are in
+  .patch(jsonParser, async (req, res, next) => {
+    const { task_id } = req.params;
+    const {
+      name,
+      description,
+      date_due,
+      completed,
+      user_assigned_id,
+    } = req.body;
+    const updateInfo = {
+      name,
+      description,
+      date_due,
+      completed,
+      user_assigned_id,
+    };
 
-  const numberOfValues = Object.values(updateInfo).filter(Boolean).length;
-  if (numberOfValues == 0) {
-    return res.status(400).json({
-      error: {
-        message: `Request must include at least one item to edit: name, description, date_due, completed, or user_assigned_id`,
-      },
-    });
-  }
+    const numberOfValues = Object.values(updateInfo).filter(Boolean).length;
+    if (numberOfValues == 0) {
+      return res.status(400).json({
+        error: {
+          message: `Request must include at least one item to edit: name, description, date_due, completed, or user_assigned_id`,
+        },
+      });
+    }
 
+    try {
+      const updatedTask = await TasksService.updateTask(
+        req.app.get('db'),
+        task_id,
+        updateInfo,
+      );
+      res.status(200).json(taskFormat(updatedTask));
+    } catch (error) {
+      next(error);
+    }
+  })
+
+  .delete(async (req, res, next) => {
+    const { task_id } = req.params;
+    try {
+      const deletedItem = await TasksService.deleteTask(
+        req.app.get('db'),
+        task_id,
+      );
+      console.log(deletedItem);
+      res.status(204).end();
+    } catch (error) {
+      next(error);
+    }
+  });
+
+async function checkTaskExists(req, res, next) {
   try {
-    const updatedTask = await TasksService.updateTask(
+    const task = await TasksService.getTaskById(
       req.app.get('db'),
-      task_id,
-      updateInfo,
+      req.params.task_id,
     );
-    res.status(200).json(taskFormat(updatedTask));
+    if (!task)
+      return res.status(404).json({
+        error: "Task doesn't exist",
+      });
+
+    res.task = task;
+    next();
   } catch (error) {
     next(error);
   }
-});
-
-tasksRouter.delete('/task/:task_id', async (req, res, next) => {
-  const { task_id } = req.params;
-  try {
-    const deletedItem = await TasksService.deleteTask(
-      req.app.get('db'),
-      task_id,
-    );
-    console.log(deletedItem);
-    res.status(204).json(`Task {task_id} was deleted.`);
-  } catch (error) {
-    next(error);
-  }
-});
+}
 
 module.exports = tasksRouter;
