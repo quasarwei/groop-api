@@ -4,8 +4,9 @@ const xss = require('xss');
 const GroupsService = require('./groups-service');
 const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
 
-groupsRouter = express.Router();
+const groupsRouter = express.Router();
 const jsonParser = express.json();
+const { requireAuth } = require('../middleware/jwt-auth');
 
 const groupFormat = group => ({
   id: group.id,
@@ -13,16 +14,18 @@ const groupFormat = group => ({
   owner_id: group.owner_id,
 });
 
-groupsRouter.post('/', jsonParser, async (req, res, next) => {
-  const { name, owner_id } = req.body;
+groupsRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
+  const { name } = req.body;
 
-  for (const field of ['name', 'owner_id'])
+  for (const field of ['name'])
     if (!req.body[field])
       return res.status(400).json({
         error: `Missing '${field}' in request body`,
       });
 
+  const owner_id = req.user.id;
   const newGroupInfo = { name, owner_id };
+
   try {
     const newGroup = await GroupsService.postNewGroup(
       req.app.get('db'),
@@ -44,18 +47,44 @@ groupsRouter.post('/', jsonParser, async (req, res, next) => {
   }
 });
 
-groupsRouter.delete('/:group_id', async (req, res, next) => {
-  const { group_id } = req.params;
+groupsRouter
+  .route('/:group_id')
+  .all(requireAuth)
+  .all(checkGroupExists)
+  .delete(async (req, res, next) => {
+    const group_id = res.group.id;
+    if (res.group.owner_id != req.user.id)
+      return res.status(401).json({
+        error: 'Unauthorized request. A group can only be deleted by its owner',
+      });
 
+    try {
+      const deletedGroup = await GroupsService.deleteGroup(
+        req.app.get('db'),
+        group_id,
+      );
+      res.status(204).end();
+    } catch (error) {
+      next(error);
+    }
+  });
+
+async function checkGroupExists(req, res, next) {
   try {
-    const deletedGroup = await GroupsService.deleteGroup(
+    const group = await GroupsService.getGroupById(
       req.app.get('db'),
-      group_id,
+      req.params.group_id,
     );
-    res.status(204).end();
+    if (!group)
+      return res.status(404).json({
+        error: "Group doesn't exist",
+      });
+
+    res.group = group;
+    next();
   } catch (error) {
     next(error);
   }
-});
+}
 
 module.exports = groupsRouter;
