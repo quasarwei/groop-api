@@ -26,7 +26,9 @@ const GroupsMembersService = {
   },
   getUserGroups(knex, member_id) {
     return knex('groop_groups_members')
-      .select('*')
+      .select('gm.group_id', 'g.name')
+      .from('groop_groups_members AS gm')
+      .leftJoin('groop_groups AS g', 'g.id', 'gm.group_id')
       .where({ member_id });
   },
 };
