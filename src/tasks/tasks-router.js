@@ -32,9 +32,18 @@ tasksRouter.get('/', requireAuth, async (req, res, next) => {
   }
 });
 
-// todo: prevent user from getting tasks in a group they are not a part of
 tasksRouter.get('/:group_id', requireAuth, async (req, res, next) => {
   const { group_id } = req.params;
+  const member_id = req.user.id;
+
+  //prevent user from getting tasks for a group they are not a part of
+  const groupMembership = await TasksService.checkGroupMembership(req.app.get('db'), group_id, member_id);
+  if(!groupMembership.length){
+    return res.status(400).json({
+      error: `Not a valid request`,
+    });
+  }
+
   try {
     const groupTasks = await TasksService.getGroupTasks(
       req.app.get('db'),
@@ -48,16 +57,16 @@ tasksRouter.get('/:group_id', requireAuth, async (req, res, next) => {
 });
 
 tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
-  const { name, description, date_due, group_id } = req.body;
+  const { name, description, date_due, user_assigned_id, group_id } = req.body;
 
-  for (const field of ['name', 'description', 'date_due', 'group_id'])
+  for (const field of ['name', 'description', 'date_due', 'user_assigned_id', 'group_id'])
     if (!req.body[field])
       return res.status(400).json({
         error: `Missing '${field}' in request body`,
       });
 
   const creator_id = req.user.id;
-  const newTaskInfo = { name, description, creator_id, date_due, group_id };
+  const newTaskInfo = { name, description, creator_id, date_due, user_assigned_id, group_id };
   try {
     const newTask = await TasksService.postNewTask(
       req.app.get('db'),
@@ -148,3 +157,4 @@ async function checkTaskExists(req, res, next) {
 }
 
 module.exports = tasksRouter;
+
