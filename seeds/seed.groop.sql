@@ -20,7 +20,7 @@ INSERT INTO groop_groups (name, owner_id)
 VALUES
     ('group1', 1),
     ('group2', 3),
-    ('group3', 4);
+    ('group3', 4),
     ('group4', 1);
 
 INSERT INTO groop_groups_members (group_id, member_id) 
@@ -39,7 +39,7 @@ VALUES
     (4, 1),
     (4, 2),
     (4, 3),
-    (4, 4),
+    (4, 4);
 
 INSERT INTO groop_tasks (name, description, creator_id, date_due, user_assigned_id, group_id)
 VALUES 
@@ -48,8 +48,8 @@ VALUES
     ('plow the field', 'urgent: last pickup coming up', 3, '12/02/2019', null, 1),
     ('feed Nessie', 'urgent: last pickup coming up', 4, '12/02/2019', 3, 1),
     ('doctor appointment', 'Suzy, 3pm, at other clinic', 3, '12/01/2019', 3, 3),
-    ('buy snowblower', 'Toro brand', 4, '12/02/2019', 2, 2);
-    ('fix that damn door', '....', 1, '12/02/2019', 1, 4);
+    ('buy snowblower', 'Toro brand', 4, '12/02/2019', 2, 2),
+    ('fix that damn door', '....', 1, '12/02/2019', 1, 4),
     ('bake cakes', 'need at least 20', 2, '12/02/2019', 1, 4);
 
 COMMIT;
