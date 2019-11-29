@@ -51,6 +51,14 @@ groupsRouter
   .route('/:group_id')
   .all(requireAuth)
   .all(checkGroupExists)
+  .get(async (req, res, next) => {
+    if (res.group.owner_id != req.user.id)
+      return res.status(401).json({
+        error:
+          'Unauthorized request. A group can only be retrieved by a member of the group',
+      });
+    res.status(200).json(res.group);
+  })
   .delete(async (req, res, next) => {
     const group_id = res.group.id;
     if (res.group.owner_id != req.user.id)
