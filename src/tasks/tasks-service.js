@@ -37,10 +37,11 @@ const TasksService = {
       .where('id', task_id)
       .delete();
   },
-  checkGroupMembership(knex, group_id, member_id){
+  checkGroupMembership(knex, group_id, member_id) {
     return knex('groop_groups_members')
       .select('*')
       .where({ group_id, member_id });
-  }
+  },
 };
+
 module.exports = TasksService;
