@@ -19,6 +19,11 @@ app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 
+app.get('/', (req, res, next) => {
+  console.log('welcome');
+  res.status(200).json({ message: 'welcome' });
+});
+
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/groups', groupsRouter);
