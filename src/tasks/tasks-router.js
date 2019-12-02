@@ -37,8 +37,12 @@ tasksRouter.get('/:group_id', requireAuth, async (req, res, next) => {
   const member_id = req.user.id;
 
   //prevent user from getting tasks for a group they are not a part of
-  const groupMembership = await TasksService.checkGroupMembership(req.app.get('db'), group_id, member_id);
-  if(!groupMembership.length){
+  const groupMembership = await TasksService.checkGroupMembership(
+    req.app.get('db'),
+    group_id,
+    member_id,
+  );
+  if (!groupMembership.length) {
     return res.status(400).json({
       error: `Not a valid request`,
     });
@@ -59,14 +63,27 @@ tasksRouter.get('/:group_id', requireAuth, async (req, res, next) => {
 tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
   const { name, description, date_due, user_assigned_id, group_id } = req.body;
 
-  for (const field of ['name', 'description', 'date_due', 'user_assigned_id', 'group_id'])
+  for (const field of [
+    'name',
+    'description',
+    'date_due',
+    'user_assigned_id',
+    'group_id',
+  ])
     if (!req.body[field])
       return res.status(400).json({
         error: `Missing '${field}' in request body`,
       });
 
   const creator_id = req.user.id;
-  const newTaskInfo = { name, description, creator_id, date_due, user_assigned_id, group_id };
+  const newTaskInfo = {
+    name,
+    description,
+    creator_id,
+    date_due,
+    user_assigned_id,
+    group_id,
+  };
   try {
     const newTask = await TasksService.postNewTask(
       req.app.get('db'),
@@ -85,6 +102,9 @@ tasksRouter
   .route('/task/:task_id')
   .all(requireAuth)
   .all(checkTaskExists)
+  .get(async (req, res, next) => {
+    res.status(200).json(taskFormat(res.task));
+  })
   // fix patch and delete so user can only edit and delete tasks in a group that they are in
   .patch(jsonParser, async (req, res, next) => {
     const { task_id } = req.params;
@@ -157,4 +177,3 @@ async function checkTaskExists(req, res, next) {
 }
 
 module.exports = tasksRouter;
-
