@@ -108,14 +108,10 @@ tasksRouter
   // fix patch and delete so user can only edit and delete tasks in a group that they are in
   .patch(jsonParser, async (req, res, next) => {
     const { task_id } = req.params;
-    const {
-      name,
-      description,
-      date_due,
-      completed,
-      user_assigned_id,
-    } = req.body;
-    const updateInfo = {
+    const { name, description, date_due, user_assigned_id } = req.body;
+    let completed = req.body.completed ? 'true' : 'false';
+
+    let updateInfo = {
       name,
       description,
       date_due,
@@ -131,6 +127,11 @@ tasksRouter
         },
       });
     }
+
+    updateInfo = {
+      ...updateInfo,
+      completed: completed === 'true' ? true : false,
+    };
 
     try {
       const updatedTask = await TasksService.updateTask(
