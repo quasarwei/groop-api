@@ -6,9 +6,11 @@ CREATE TABLE groop_tasks (
   creator_id INTEGER 
     REFERENCES groop_users(id) ON DELETE CASCADE NOT NULL,
   date_due DATE NOT NULL,
+  group_id INTEGER
+    REFERENCES groop_groups(id) ON DELETE CASCADE NOT NULL,
   user_assigned_id INTEGER
     REFERENCES groop_users(id) ON DELETE CASCADE,
-  group_id INTEGER
-    REFERENCES groop_groups(id) ON DELETE CASCADE NOT NULL
+  category_id INTEGER 
+    REFERENCES groop_task_categories(id)
 );
-   
+
