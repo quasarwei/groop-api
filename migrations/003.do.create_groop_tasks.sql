@@ -11,6 +11,10 @@ CREATE TABLE groop_tasks (
   user_assigned_id INTEGER
     REFERENCES groop_users(id) ON DELETE CASCADE,
   category_id INTEGER 
-    REFERENCES groop_task_categories(id)
+    REFERENCES groop_task_categories(id),
+  points INTEGER
+    REFERENCES group_user(id) NOT NULL CHECK (points >= 0) ON DELETE CASCADE NOT NULL,
+  overall_points INTEGER
+    REFERENCES group_user(id) ON DELETE CASCADE NOT NULL
 );
 
