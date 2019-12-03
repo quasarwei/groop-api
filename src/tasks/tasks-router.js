@@ -16,6 +16,8 @@ const taskFormat = task => ({
   date_due: task.date_due,
   user_assigned_id: task.user_assigned_id,
   group_id: task.group_id,
+  category_id: task.category_id,
+  priority: task.priority,
 });
 
 // get all tasks that authorized user is assigned to
@@ -61,7 +63,15 @@ tasksRouter.get('/:group_id', requireAuth, async (req, res, next) => {
 });
 
 tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
-  const { name, description, date_due, user_assigned_id, group_id } = req.body;
+  const {
+    name,
+    description,
+    date_due,
+    user_assigned_id,
+    group_id,
+    category_id,
+    priority,
+  } = req.body;
 
   for (const field of [
     'name',
@@ -69,6 +79,7 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
     'date_due',
     'user_assigned_id',
     'group_id',
+    'priority',
   ])
     if (!req.body[field])
       return res.status(400).json({
@@ -83,6 +94,8 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
     date_due,
     user_assigned_id,
     group_id,
+    category_id,
+    priority,
   };
   try {
     const newTask = await TasksService.postNewTask(
@@ -108,7 +121,14 @@ tasksRouter
   // fix patch and delete so user can only edit and delete tasks in a group that they are in
   .patch(jsonParser, async (req, res, next) => {
     const { task_id } = req.params;
-    const { name, description, date_due, user_assigned_id } = req.body;
+    const {
+      name,
+      description,
+      date_due,
+      user_assigned_id,
+      category_id,
+      priority,
+    } = req.body;
     let completed = req.body.completed ? 'true' : 'false';
 
     let updateInfo = {
@@ -117,6 +137,8 @@ tasksRouter
       date_due,
       completed,
       user_assigned_id,
+      category_id,
+      priority,
     };
 
     const numberOfValues = Object.values(updateInfo).filter(Boolean).length;
