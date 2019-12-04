@@ -43,12 +43,12 @@ VALUES
 
 INSERT INTO groop_task_categories (category_name, group_id)
 VALUES
-    (errands, 1),
-    (outdoor chores, 1),
-    (appointments, 3),
-    (shopping, 2),
-    (indoor jobs, 4),
-    (cooking, 4);
+    ('errands', 1),
+    ('outdoor chores', 1),
+    ('appointments', 3),
+    ('shopping', 2),
+    ('indoor jobs', 4),
+    ('cooking', 4);
 
 INSERT INTO groop_tasks 
     (name, description, creator_id, date_due, group_id, user_assigned_id, category_id)
