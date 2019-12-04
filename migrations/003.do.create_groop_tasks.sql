@@ -9,6 +9,8 @@ CREATE TABLE groop_tasks (
   group_id INTEGER
     REFERENCES groop_groups(id) ON DELETE CASCADE NOT NULL,
   user_assigned_id INTEGER
-    REFERENCES groop_users(id) ON DELETE CASCADE
+    REFERENCES groop_users(id) ON DELETE CASCADE,
+  priority INTEGER NOT NULL,
+  time_start TIME with time zone,
+  time_end TIME with time zone
 );
-
