@@ -4,9 +4,6 @@ const xss = require('xss');
 const TasksService = require('./tasks-service.js');
 const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
 
-const nodemailer = require('nodemailer');
-const { transporter } = require('../mail-service');
-
 const tasksRouter = express.Router();
 const jsonParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
@@ -116,7 +113,8 @@ tasksRouter
   })
   .patch(jsonParser, async (req, res, next) => {
     const { task_id } = req.params;
-    const { name, description, date_due, group_id, user_assigned_id, category_id } = req.body;
+
+    const { name, description, date_due, group_id, user_assigned_id, category_id, priority} = req.body;
     let completed = req.body.completed ? 'true' : 'false';
 
     //prevent user from getting tasks for a group they are not a part of
@@ -141,6 +139,7 @@ tasksRouter
       date_due,
       completed,
       user_assigned_id,
+      priority,
       category_id
     };
 
@@ -164,40 +163,22 @@ tasksRouter
         task_id,
         updateInfo,
       );
+      
       if (updatedTask) {
-        const group_id = updatedTask.group_id;
-
-        // get all member emails in tthe group
-        // that have email notifcations on (do later)
-        const groupUsers = await GroupsMembersService.getGroupMembers(
+        const newScore = await GroupsMembersService.calculateScore(
           req.app.get('db'),
-          group_id,
+          updatedTask.group_id,
+          updatedTask.user_assigned_id,
         );
-        const emails = groupUsers.map(user => user.email);
-        let allMailOptions = emails.map(email => {
-          return {
-            from: '"13 Minutes" <groopnotify@gmail.com>',
-            to: email,
-            subject: `Task ${updatedTask.name} has been updated`,
-            html: `<section style="margin: 0 auto;"><div style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center; background-color: #363432; color: #fafafa; "><h2>Groop</h2><div style="height: 0; width: 200px; border: 1px solid #4a9afa;"></div><h1>The following task has been updated</h1><div style="text-align: left;"><p>${updatedTask.name}</p><p>${updatedTask.description}</p><p>completed: ${updatedTask.completed}</p></div></div></section>`,
-          };
-        });
 
-        allMailOptions.forEach(async mailOption => {
-          return (info = await transporter.sendMail(mailOption, function(
-            error,
-            info,
-          ) {
-            if (error) return false;
-            else {
-              console.log('Message sent: ' + info.response);
-              return true;
-            }
-          }));
-        });
-
-        res.status(200).json(taskFormat(updatedTask));
+        const groupmember = await GroupsMembersService.updateScore(
+          req.app.get('db'),
+          updatedTask.group_id,
+          updatedTask.user_assigned_id,
+          { score: newScore[0].score },
+        );
       }
+      res.status(200).json(taskFormat(updatedTask));
     } catch (error) {
       next(error);
     }
