@@ -3,8 +3,7 @@ const express = require('express');
 const path = require('path');
 const UsersService = require('./users-service');
 const nodemailer = require('nodemailer');
-
-const { MAIL_PSWD } = require('../config');
+const { transporter } = require('../mail-service');
 
 const usersRouter = express.Router();
 const jsonBodyParser = express.json();
@@ -41,16 +40,6 @@ usersRouter.post('/', jsonBodyParser, async (req, res, next) => {
     );
     if (hasUserWithEmail)
       return res.status(400).json({ error: 'Email is already being used' });
-
-    // create reusable transporter obejct using the default SMTP transport
-    let transporter = nodemailer.createTransport({
-      service: 'gmail',
-      host: 'smtp.gmail.com',
-      auth: {
-        user: 'groopnotify@gmail.com',
-        pass: MAIL_PSWD,
-      },
-    });
 
     // prettier-ignore
     let mailOptions = {

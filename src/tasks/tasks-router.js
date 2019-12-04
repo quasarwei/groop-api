@@ -2,6 +2,10 @@ const express = require('express');
 const path = require('path');
 const xss = require('xss');
 const TasksService = require('./tasks-service.js');
+const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
+
+const nodemailer = require('nodemailer');
+const { transporter } = require('../mail-service');
 
 const tasksRouter = express.Router();
 const jsonParser = express.json();
@@ -16,6 +20,8 @@ const taskFormat = task => ({
   date_due: task.date_due,
   user_assigned_id: task.user_assigned_id,
   group_id: task.group_id,
+  category_id: task.category_id,
+  priority: task.priority,
 });
 
 // get all tasks that authorized user is assigned to
@@ -61,7 +67,15 @@ tasksRouter.get('/:group_id', requireAuth, async (req, res, next) => {
 });
 
 tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
-  const { name, description, date_due, user_assigned_id, group_id } = req.body;
+  const {
+    name,
+    description,
+    date_due,
+    user_assigned_id,
+    group_id,
+    // category_id,
+    // priority,
+  } = req.body;
 
   for (const field of [
     'name',
@@ -69,6 +83,7 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
     'date_due',
     'user_assigned_id',
     'group_id',
+    // 'priority',
   ])
     if (!req.body[field])
       return res.status(400).json({
@@ -83,6 +98,8 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
     date_due,
     user_assigned_id,
     group_id,
+    // category_id,
+    // priority,
   };
   try {
     const newTask = await TasksService.postNewTask(
@@ -108,7 +125,14 @@ tasksRouter
   // fix patch and delete so user can only edit and delete tasks in a group that they are in
   .patch(jsonParser, async (req, res, next) => {
     const { task_id } = req.params;
-    const { name, description, date_due, user_assigned_id } = req.body;
+    const {
+      name,
+      description,
+      date_due,
+      user_assigned_id,
+      category_id,
+      priority,
+    } = req.body;
     let completed = req.body.completed ? 'true' : 'false';
 
     let updateInfo = {
@@ -117,6 +141,8 @@ tasksRouter
       date_due,
       completed,
       user_assigned_id,
+      category_id,
+      priority,
     };
 
     const numberOfValues = Object.values(updateInfo).filter(Boolean).length;
@@ -139,7 +165,40 @@ tasksRouter
         task_id,
         updateInfo,
       );
-      res.status(200).json(taskFormat(updatedTask));
+      if (updatedTask) {
+        const group_id = updatedTask.group_id;
+
+        // get all member emails in tthe group
+        // that have email notifcations on (do later)
+        const groupUsers = await GroupsMembersService.getGroupMembers(
+          req.app.get('db'),
+          group_id,
+        );
+        const emails = groupUsers.map(user => user.email);
+        let allMailOptions = emails.map(email => {
+          return {
+            from: '"13 Minutes" <groopnotify@gmail.com>',
+            to: email,
+            subject: `Task ${updatedTask.name} has been updated`,
+            html: `<section style="margin: 0 auto;"><div style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center; background-color: #363432; color: #fafafa; "><h2>Groop</h2><div style="height: 0; width: 200px; border: 1px solid #4a9afa;"></div><h1>The following task has been updated</h1><div style="text-align: left;"><p>${updatedTask.name}</p><p>${updatedTask.description}</p><p>completed: ${updatedTask.completed}</p></div></div></section>`,
+          };
+        });
+
+        allMailOptions.forEach(async mailOption => {
+          return (info = await transporter.sendMail(mailOption, function(
+            error,
+            info,
+          ) {
+            if (error) return false;
+            else {
+              console.log('Message sent: ' + info.response);
+              return true;
+            }
+          }));
+        });
+
+        res.status(200).json(taskFormat(updatedTask));
+      }
     } catch (error) {
       next(error);
     }
