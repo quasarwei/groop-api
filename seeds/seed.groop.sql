@@ -62,5 +62,4 @@ VALUES
     ('buy snowblower', 'Toro brand', 4, '12/02/2019', 2, 6, 4),
     ('fix door', 'lower hinge loose', 1, '12/02/2019', 4, 1, 5),
     ('bake cakes', 'need at least 15 for school sale', 2, '12/04/2019', 4, 4, 6);
-
 COMMIT;

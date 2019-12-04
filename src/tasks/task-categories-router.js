@@ -12,7 +12,6 @@ const categoryFormat = category => ({
   group_id: category.group_id
 });
 
-
 taskCategoriesRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
   const { category_name, group_id } = req.body;
 
@@ -135,7 +134,7 @@ taskCategoriesRouter.delete('/:category_id/:group_id', requireAuth, async (req, 
     }
 });
 
-
+//spare comment
 async function checkCategoryExists(req, res, next) {
   try {
     const task = await TaskCategoriesService.getCategoryInfo(
