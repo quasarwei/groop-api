@@ -10,6 +10,7 @@ const usersRouter = require('./users/users-router');
 const groupsRouter = require('./groups/groups-router');
 const groupsMembersRouter = require('./groupsmembers/groupsmembers-router');
 const tasksRouter = require('./tasks/tasks-router');
+const taskCategoriesRouter = require('./tasks/task-categories-router');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/groups', groupsRouter);
 app.use('/api/groupsmembers', groupsMembersRouter);
 app.use('/api/tasks', tasksRouter);
+app.use('/api/categories', taskCategoriesRouter);
 
 app.use(function errorHandler(error, req, res, next) {
   //eslint-disable-line no-unused-vars
