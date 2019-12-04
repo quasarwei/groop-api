@@ -209,12 +209,15 @@ tasksRouter
           updatedTask.group_id,
           updatedTask.user_assigned_id
         );
+        
+        let score = newScore[0].score;
+        if (newScore[0].score == null) score = 0;
 
         const groupmember = await GroupsMembersService.updateScore(
           req.app.get('db'),
           updatedTask.group_id,
           updatedTask.user_assigned_id,
-          { score: newScore[0].score }
+          { score }
         );
 
         const group_id = updatedTask.group_id;
