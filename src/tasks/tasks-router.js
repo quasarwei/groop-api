@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const xss = require('xss');
 const TasksService = require('./tasks-service.js');
+const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
 
 const tasksRouter = express.Router();
 const jsonParser = express.json();
@@ -108,7 +109,13 @@ tasksRouter
   // fix patch and delete so user can only edit and delete tasks in a group that they are in
   .patch(jsonParser, async (req, res, next) => {
     const { task_id } = req.params;
-    const { name, description, date_due, user_assigned_id } = req.body;
+    const {
+      name,
+      description,
+      date_due,
+      user_assigned_id,
+      priority,
+    } = req.body;
     let completed = req.body.completed ? 'true' : 'false';
 
     let updateInfo = {
@@ -117,6 +124,7 @@ tasksRouter
       date_due,
       completed,
       user_assigned_id,
+      priority,
     };
 
     const numberOfValues = Object.values(updateInfo).filter(Boolean).length;
@@ -139,6 +147,21 @@ tasksRouter
         task_id,
         updateInfo,
       );
+
+      if (updatedTask) {
+        const newScore = await GroupsMembersService.calculateScore(
+          req.app.get('db'),
+          updatedTask.group_id,
+          updatedTask.user_assigned_id,
+        );
+
+        const groupmember = await GroupsMembersService.updateScore(
+          req.app.get('db'),
+          updatedTask.group_id,
+          updatedTask.user_assigned_id,
+          { score: newScore[0].score },
+        );
+      }
       res.status(200).json(taskFormat(updatedTask));
     } catch (error) {
       next(error);

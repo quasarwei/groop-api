@@ -3,9 +3,11 @@ CREATE TABLE groop_groups_members (
   group_id INTEGER 
     REFERENCES groop_groups(id) ON DELETE CASCADE NOT NULL,
   member_id INTEGER
-    REFERENCES groop_users(id) ON DELETE CASCADE NOT NULL 
-  points INTEGER
-    REFERENCES group_user(id) NOT NULL CHECK (points >= 0) ON DELETE CASCADE NOT NULL,
-  overall_points INTEGER
-    REFERENCES group_user(id) ON DELETE CASCADE NOT NULL
+    REFERENCES groop_users(id) ON DELETE CASCADE NOT NULL,
+  score INTEGER DEFAULT 0 CHECK (score >= 0) NOT NULL
+    
+    /* look at all of the tasks in a group
+        filter out all of teh tasks that are assigned to the member with member_id
+        and all completed tasks
+        look at the priority column of each task and sum the up to get score1 */ 
 );

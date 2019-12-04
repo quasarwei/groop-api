@@ -14,6 +14,7 @@ const GroupsMembersService = {
     return knex
       .select(
         'gm.member_id',
+        'gm.score',
         'u.username',
         'u.fullname',
         'gm.group_id',
@@ -30,6 +31,19 @@ const GroupsMembersService = {
       .from('groop_groups_members AS gm')
       .leftJoin('groop_groups AS g', 'g.id', 'gm.group_id')
       .where({ member_id });
+  },
+  calculateScore(knex, group_id, user_assigned_id) {
+    return knex
+      .sum({ score: 'priority' })
+      .from('groop_tasks')
+      .where({ group_id, user_assigned_id, completed: true });
+  },
+  updateScore(knex, group_id, member_id, score) {
+    return knex('groop_groups_members')
+      .where({ group_id, member_id })
+      .update(score)
+      .returning('*')
+      .then(rows => rows[0]);
   },
 };
 module.exports = GroupsMembersService;
