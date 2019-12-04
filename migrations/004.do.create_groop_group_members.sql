@@ -4,4 +4,8 @@ CREATE TABLE groop_groups_members (
     REFERENCES groop_groups(id) ON DELETE CASCADE NOT NULL,
   member_id INTEGER
     REFERENCES groop_users(id) ON DELETE CASCADE NOT NULL 
+  points INTEGER
+    REFERENCES group_user(id) NOT NULL CHECK (points >= 0) ON DELETE CASCADE NOT NULL,
+  overall_points INTEGER
+    REFERENCES group_user(id) ON DELETE CASCADE NOT NULL
 );
