@@ -51,16 +51,16 @@ VALUES
     ('cooking', 4);
 
 INSERT INTO groop_tasks 
-    (name, description, creator_id, date_due, group_id, user_assigned_id, category_id)
+    (name, description, creator_id, date_due, group_id, user_assigned_id)
 VALUES 
-    ('buy milk', 'get 3 gallons', 3, '12/01/2019', 1, 1, 1),
-    ('rake leaves', 'last fall pickup this week', 1, '12/02/2019', 1, 1, 2),
-    ('plow the field', 'rain in forecast for weekend', 3, '12/02/2019', 1, null, 2),
-    ('feed Nessie', 'use up older feed batch', 4, '12/02/2019', 1, 3, 2),
-    ('doctor appointment', 'Suzy, 3pm, at other clinic', 3, '12/01/2019', 3, 3, 3),
-    ('get meds for Grandpa', 'pharmacy on 5th St.', 2, '12/01/2019', 3, 5, null),
-    ('buy snowblower', 'Toro brand', 4, '12/02/2019', 2, 6, 4),
-    ('fix door', 'lower hinge loose', 1, '12/02/2019', 4, 1, 5),
-    ('bake cakes', 'need at least 15 for school sale', 2, '12/04/2019', 4, 4, 6);
+    ('buy milk', 'get 3 gallons', 3, '12/01/2019', 1, 1),
+    ('rake leaves', 'last fall pickup this week', 1, '12/02/2019', 1, 1),
+    ('plow the field', 'rain in forecast for weekend', 3, '12/02/2019', 1, null),
+    ('feed Nessie', 'use up older feed batch', 4, '12/02/2019', 1, 3),
+    ('doctor appointment', 'Suzy, 3pm, at other clinic', 3, '12/01/2019', 3, 3),
+    ('get meds for Grandpa', 'pharmacy on 5th St.', 2, '12/01/2019', 3, 5),
+    ('buy snowblower', 'Toro brand', 4, '12/02/2019', 2, 6),
+    ('fix door', 'lower hinge loose', 1, '12/02/2019', 4, 1),
+    ('bake cakes', 'need at least 15 for school sale', 2, '12/04/2019', 4, 4);
 
 COMMIT;
