@@ -89,6 +89,19 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
         error: `Missing '${field}' in request body`
       });
 
+  //prevent user from adding tasks for a group they are not a part of
+  const member_id = req.user.id;
+  const groupMembership = await TasksService.checkGroupMembership(
+    req.app.get('db'),
+    group_id,
+    member_id
+  );
+  if (!groupMembership.length) {
+    return res.status(400).json({ error: `Not a valid request` });
+  }
+
+  //NEED: check to see if categoryId is valid for the groupId
+
   const creator_id = req.user.id;
   //NOTE: a new task is assigned by default to the creator
   const user_assigned_id = creator_id;
@@ -123,6 +136,7 @@ tasksRouter
   .all(requireAuth)
   .all(checkTaskExists)
   .get(async (req, res, next) => {
+    //ADD: a user who is not part of the group should not be able to GET task by ID
     res.status(200).json(taskFormat(res.task));
   })
   .patch(jsonParser, async (req, res, next) => {
@@ -141,7 +155,7 @@ tasksRouter
     } = req.body;
     let completed = req.body.completed ? 'true' : 'false';
 
-    //prevent user from getting tasks for a group they are not a part of
+    //prevent user from editing tasks for a group they are not a part of
     //start by checking for group_id
     if (!group_id) {
       return res.status(400).json({ error: `Group ID missing` });
@@ -252,22 +266,33 @@ tasksRouter
     } catch (error) {
       next(error);
     }
-  })
-  //NEED: prevent users from deleting tasks for other groups
-  .delete(async (req, res, next) => {
-    const { task_id } = req.params;
+});
+tasksRouter.delete('/:task_id/:group_id', requireAuth, async (req, res, next) => {
+  const { task_id } = req.params;
+  const { group_id } = req.params;
 
-    try {
-      const deletedItem = await TasksService.deleteTask(
-        req.app.get('db'),
-        task_id
-      );
-      console.log(deletedItem);
-      res.status(204).end();
-    } catch (error) {
-      next(error);
-    }
-  });
+  //prevent user from deleting a category if they are not a part of the group
+  const member_id = req.user.id;
+  const groupMembership = await TasksService.checkGroupMembership(
+    req.app.get('db'),
+    group_id,
+    member_id,
+  );
+  if (!groupMembership.length) {
+    return res.status(400).json({ error: `Not a valid request` });
+  }
+
+  try {
+    const deletedItem = await TasksService.deleteTask(
+      req.app.get('db'),
+      task_id
+    );
+    console.log(deletedItem);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
 
 async function checkTaskExists(req, res, next) {
   try {

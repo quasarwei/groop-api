@@ -108,30 +108,30 @@ taskCategoriesRouter.route('/:category_id')
 });
 
 taskCategoriesRouter.delete('/:category_id/:group_id', requireAuth, async (req, res, next) => {
-    const { category_id } = req.params;
-    const { group_id } = req.params;
+  const { category_id } = req.params;
+  const { group_id } = req.params;
 
-    //prevent user from deleting a category if they are not a part of the group
-    const member_id = req.user.id;
-    const groupMembership = await TasksService.checkGroupMembership(
+  //prevent user from deleting a category if they are not a part of the group
+  const member_id = req.user.id;
+  const groupMembership = await TasksService.checkGroupMembership(
+    req.app.get('db'),
+    group_id,
+    member_id,
+  );
+  if (!groupMembership.length) {
+    return res.status(400).json({ error: `Not a valid request` });
+  }
+
+  try {
+    const deletedCategory = await TaskCategoriesService.deleteCategory(
       req.app.get('db'),
-      group_id,
-      member_id,
+      category_id
     );
-    if (!groupMembership.length) {
-      return res.status(400).json({ error: `Not a valid request` });
-    }
-
-    try {
-      const deletedCategory = await TaskCategoriesService.deleteCategory(
-        req.app.get('db'),
-        category_id
-      );
-      console.log(deletedCategory);
-      res.status(204).end();
-    } catch (error) {
-      next(error);
-    }
+    console.log(deletedCategory);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
 });
 
 //spare comment
