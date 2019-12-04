@@ -49,7 +49,7 @@ VALUES
     ('shopping', 2),
     ('indoor jobs', 4),
     ('cooking', 4);
-
+    
 INSERT INTO groop_tasks 
     (name, description, creator_id, date_due, group_id, user_assigned_id, category_id, priority)
 VALUES 
@@ -62,4 +62,5 @@ VALUES
     ('buy snowblower', 'Toro brand', 4, '12/02/2019', 2, 6, 4, null),
     ('fix door', 'lower hinge loose', 1, '12/02/2019', 4, 1, 5, 1),
     ('bake cakes', 'need at least 15 for school sale', 2, '12/04/2019', 4, 4, 6, 3);
+
 COMMIT;
