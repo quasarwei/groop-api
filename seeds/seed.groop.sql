@@ -59,7 +59,7 @@ VALUES
     ('feed Nessie', 'use up older feed batch', 4, '12/02/2019', 1, 3, 2, 3),
     ('doctor appointment', 'Suzy, 3pm, at other clinic', 3, '12/01/2019', 3, 3, 3, 3),
     ('get meds for Grandpa', 'pharmacy on 5th St.', 2, '12/01/2019', 3, 5, null, 3),
-    ('buy snowblower', 'Toro brand', 4, '12/02/2019', 2, 6, 4, null),
+    ('buy snowblower', 'Toro brand', 4, '12/02/2019', 2, 6, 4, 1),
     ('fix door', 'lower hinge loose', 1, '12/02/2019', 4, 1, 5, 1),
     ('bake cakes', 'need at least 15 for school sale', 2, '12/04/2019', 4, 4, 6, 3);
 
