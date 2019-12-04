@@ -18,8 +18,8 @@ const taskFormat = task => ({
   completed: task.completed,
   creator_id: task.creator_id,
   date_due: task.date_due,
-  user_assigned_id: task.user_assigned_id,
   group_id: task.group_id,
+  user_assigned_id: task.user_assigned_id,
   category_id: task.category_id,
   priority: task.priority,
 });
@@ -67,23 +67,14 @@ tasksRouter.get('/:group_id', requireAuth, async (req, res, next) => {
 });
 
 tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
-  const {
-    name,
-    description,
-    date_due,
-    user_assigned_id,
-    group_id,
-    // category_id,
-    // priority,
-  } = req.body;
+  const { name, description, date_due, group_id, category_id } = req.body;
 
   for (const field of [
     'name',
-    'description',
+    'description', //QUESTION: why is description required??
     'date_due',
-    'user_assigned_id',
     'group_id',
-    // 'priority',
+    'category_id'
   ])
     if (!req.body[field])
       return res.status(400).json({
@@ -91,15 +82,16 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
       });
 
   const creator_id = req.user.id;
+  //NOTE: a new task is assigned by default to the creator
+  const user_assigned_id = creator_id;
   const newTaskInfo = {
     name,
     description,
     creator_id,
     date_due,
-    user_assigned_id,
     group_id,
-    // category_id,
-    // priority,
+    user_assigned_id,
+    category_id
   };
   try {
     const newTask = await TasksService.postNewTask(
@@ -122,18 +114,26 @@ tasksRouter
   .get(async (req, res, next) => {
     res.status(200).json(taskFormat(res.task));
   })
-  // fix patch and delete so user can only edit and delete tasks in a group that they are in
   .patch(jsonParser, async (req, res, next) => {
     const { task_id } = req.params;
-    const {
-      name,
-      description,
-      date_due,
-      user_assigned_id,
-      category_id,
-      priority,
-    } = req.body;
+    const { name, description, date_due, group_id, user_assigned_id, category_id } = req.body;
     let completed = req.body.completed ? 'true' : 'false';
+
+    //prevent user from getting tasks for a group they are not a part of
+    //start by checking for group_id
+    if (!group_id) {
+      return res.status(400).json({ error: `Group ID missing` });
+    }
+    const member_id = req.user.id;
+    const groupMembership = await TasksService.checkGroupMembership(
+      req.app.get('db'),
+      group_id,
+      member_id,
+    );
+    if (!groupMembership.length) {
+      return res.status(400).json({ error: `Not a valid request` });
+    }
+    
 
     let updateInfo = {
       name,
@@ -141,15 +141,14 @@ tasksRouter
       date_due,
       completed,
       user_assigned_id,
-      category_id,
-      priority,
+      category_id
     };
 
     const numberOfValues = Object.values(updateInfo).filter(Boolean).length;
     if (numberOfValues == 0) {
       return res.status(400).json({
         error: {
-          message: `Request must include at least one item to edit: name, description, date_due, completed, or user_assigned_id`,
+          message: `Request must include at least one item to edit: name, description, date_due, completed, user_assigned_id, or category_id`
         },
       });
     }
@@ -206,6 +205,7 @@ tasksRouter
 
   .delete(async (req, res, next) => {
     const { task_id } = req.params;
+
     try {
       const deletedItem = await TasksService.deleteTask(
         req.app.get('db'),
