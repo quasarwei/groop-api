@@ -22,7 +22,7 @@ app.use(cors());
 
 app.get('/', (req, res, next) => {
   console.log('welcome');
-  res.status(200).json({ message: 'welcome' });
+  res.status(200).send('Hello, groups!');
 });
 
 app.use('/api/auth', authRouter);
