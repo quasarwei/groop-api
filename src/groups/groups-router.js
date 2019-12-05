@@ -2,11 +2,11 @@ const express = require('express');
 const path = require('path');
 const xss = require('xss');
 const GroupsService = require('./groups-service');
-const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
 
 const groupsRouter = express.Router();
 const jsonParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
+const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
 
 const groupFormat = group => ({
   id: group.id,

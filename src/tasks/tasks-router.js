@@ -2,11 +2,13 @@ const express = require('express');
 const path = require('path');
 const xss = require('xss');
 const TasksService = require('./tasks-service.js');
-const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
 
 const tasksRouter = express.Router();
 const jsonParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
+const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
+
+const { transporter } = require('../mail-service');
 
 const taskFormat = task => ({
   id: task.id,
@@ -20,7 +22,7 @@ const taskFormat = task => ({
   category_id: task.category_id,
   priority: task.priority,
   time_start: task.time_start,
-  time_end: task.time_end
+  time_end: task.time_end,
 });
 
 // get all tasks that authorized user is assigned to
@@ -28,7 +30,7 @@ tasksRouter.get('/', requireAuth, async (req, res, next) => {
   try {
     const userTasks = await TasksService.getTasksByAssignee(
       req.app.get('db'),
-      req.user.id
+      req.user.id,
     );
     const userTasksSanitized = userTasks.map(taskFormat);
     res.status(200).json(userTasksSanitized);
@@ -45,18 +47,18 @@ tasksRouter.get('/:group_id', requireAuth, async (req, res, next) => {
   const groupMembership = await TasksService.checkGroupMembership(
     req.app.get('db'),
     group_id,
-    member_id
+    member_id,
   );
   if (!groupMembership.length) {
     return res.status(400).json({
-      error: `Not a valid request`
+      error: `Not a valid request`,
     });
   }
 
   try {
     const groupTasks = await TasksService.getGroupTasks(
       req.app.get('db'),
-      group_id
+      group_id,
     );
     const allGroupTasks = groupTasks.map(taskFormat);
     res.status(200).json(allGroupTasks);
@@ -74,7 +76,7 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
     category_id,
     priority,
     time_start,
-    time_end
+    time_end,
   } = req.body;
 
   for (const field of [
@@ -82,22 +84,23 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
     'date_due',
     'group_id',
     'category_id',
-    'priority'
+    'priority',
   ])
     if (!req.body[field])
       return res.status(400).json({
-        error: `Missing '${field}' in request body`
+        error: `Missing '${field}' in request body`,
       });
 
   //prevent user from adding tasks for a group they are not a part of
-  const member_id = req.user.id;
   const groupMembership = await TasksService.checkGroupMembership(
     req.app.get('db'),
     group_id,
-    member_id
+    req.user.id,
   );
   if (!groupMembership.length) {
-    return res.status(400).json({ error: `Not a valid request` });
+    return res
+      .status(400)
+      .json({ error: `Unauthorized request: Not a member of the group` });
   }
 
   //NEED: check to see if categoryId is valid for the groupId
@@ -115,12 +118,12 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
     category_id,
     priority,
     time_start,
-    time_end
+    time_end,
   };
   try {
     const newTask = await TasksService.postNewTask(
       req.app.get('db'),
-      newTaskInfo
+      newTaskInfo,
     );
     res
       .status(201)
@@ -135,8 +138,8 @@ tasksRouter
   .route('/task/:task_id')
   .all(requireAuth)
   .all(checkTaskExists)
+  .all(checkUserGroup)
   .get(async (req, res, next) => {
-    //ADD: a user who is not part of the group should not be able to GET task by ID
     res.status(200).json(taskFormat(res.task));
   })
   .patch(jsonParser, async (req, res, next) => {
@@ -146,29 +149,17 @@ tasksRouter
       name,
       description,
       date_due,
-      group_id,
       user_assigned_id,
       category_id,
       priority,
       time_start,
-      time_end
+      time_end,
     } = req.body;
-    let completed = req.body.completed ? 'true' : 'false';
-
-    //prevent user from editing tasks for a group they are not a part of
-    //start by checking for group_id
-    if (!group_id) {
-      return res.status(400).json({ error: `Group ID missing` });
-    }
-    const member_id = req.user.id;
-    const groupMembership = await TasksService.checkGroupMembership(
-      req.app.get('db'),
-      group_id,
-      member_id
-    );
-    if (!groupMembership.length) {
-      return res.status(400).json({ error: `Not a valid request` });
-    }
+    let completed = req.body.completed
+      ? 'true'
+      : req.body.completed === undefined
+      ? undefined
+      : 'false';
 
     let updateInfo = {
       name,
@@ -179,37 +170,37 @@ tasksRouter
       priority,
       time_start,
       time_end,
-      completed
+      completed,
     };
 
     const numberOfValues = Object.values(updateInfo).filter(Boolean).length;
     if (numberOfValues == 0) {
       return res.status(400).json({
         error: {
-          message: `Request must include at least one item to edit: name, description, date_due, completed, user_assigned_id, or category_id`
-        }
+          message: `Request must include at least one item to edit: name, description, date_due, completed, user_assigned_id, or category_id`,
+        },
       });
     }
 
     updateInfo = {
       ...updateInfo,
-      completed: completed === 'true' ? true : false
+      completed: completed === 'true' ? true : false,
     };
 
     try {
       const updatedTask = await TasksService.updateTask(
         req.app.get('db'),
         task_id,
-        updateInfo
+        updateInfo,
       );
 
       if (updatedTask) {
         const newScore = await GroupsMembersService.calculateScore(
           req.app.get('db'),
           updatedTask.group_id,
-          updatedTask.user_assigned_id
+          updatedTask.user_assigned_id,
         );
-        
+
         let score = newScore[0].score;
         if (newScore[0].score == null) score = 0;
 
@@ -217,18 +208,20 @@ tasksRouter
           req.app.get('db'),
           updatedTask.group_id,
           updatedTask.user_assigned_id,
-          { score }
+          { score },
         );
 
         const group_id = updatedTask.group_id;
 
         // get all member emails in tthe group
-        // that have email notifcations on (do later)
+        // that have email notifications turned on
         const groupUsers = await GroupsMembersService.getGroupMembers(
           req.app.get('db'),
-          group_id
+          group_id,
         );
-        const emails = groupUsers.map(user => user.email);
+        const emails = groupUsers
+          .filter(user => user.notifications)
+          .map(user => user.email);
         let allMailOptions = emails.map(email => {
           // prettier-ignore
           return {
@@ -239,7 +232,7 @@ tasksRouter
             <section style="margin: 0 auto;">
               <div style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center; background-color: #363432; color: #fafafa; ">
                 <h2>Groop</h2>
-                <div style="height: 0; width: 200px; border: 1px solid #4a9afa;"></div>
+                <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
                 <h1>The following task has been updated</h1>
                 <div style="text-align: left;">
                   <p>${updatedTask.name}</p>
@@ -254,7 +247,7 @@ tasksRouter
         allMailOptions.forEach(async mailOption => {
           return (info = await transporter.sendMail(mailOption, function(
             error,
-            info
+            info,
           ) {
             if (error) return false;
             else {
@@ -269,46 +262,53 @@ tasksRouter
     } catch (error) {
       next(error);
     }
-});
-tasksRouter.delete('/:task_id/:group_id', requireAuth, async (req, res, next) => {
-  const { task_id } = req.params;
-  const { group_id } = req.params;
+  })
+  .delete(async (req, res, next) => {
+    const { task_id } = req.params;
 
-  //prevent user from deleting a category if they are not a part of the group
-  const member_id = req.user.id;
-  const groupMembership = await TasksService.checkGroupMembership(
-    req.app.get('db'),
-    group_id,
-    member_id,
-  );
-  if (!groupMembership.length) {
-    return res.status(400).json({ error: `Not a valid request` });
-  }
-
-  try {
-    const deletedItem = await TasksService.deleteTask(
-      req.app.get('db'),
-      task_id
-    );
-    console.log(deletedItem);
-    res.status(204).end();
-  } catch (error) {
-    next(error);
-  }
-});
+    try {
+      const deletedItem = await TasksService.deleteTask(
+        req.app.get('db'),
+        task_id,
+      );
+      console.log(deletedItem);
+      res.status(204).end();
+    } catch (error) {
+      next(error);
+    }
+  });
 
 async function checkTaskExists(req, res, next) {
   try {
     const task = await TasksService.getTaskById(
       req.app.get('db'),
-      req.params.task_id
+      req.params.task_id,
     );
     if (!task)
       return res.status(404).json({
-        error: "Task doesn't exist"
+        error: "Task doesn't exist",
       });
 
     res.task = task;
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function checkUserGroup(req, res, next) {
+  try {
+    // validate that user is a member of the group
+    const groupMembership = await TasksService.checkGroupMembership(
+      req.app.get('db'),
+      res.task.group_id,
+      req.user.id,
+    );
+    if (!groupMembership.length) {
+      return res.status(400).json({
+        error: `Unauthorized request: User isn't a member of the task's group`,
+      });
+    }
     next();
   } catch (error) {
     next(error);

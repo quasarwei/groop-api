@@ -3,5 +3,6 @@ CREATE TABLE groop_users (
   fullname TEXT NOT NULL,
   username TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE
+  email TEXT NOT NULL UNIQUE,
+  notifications BOOLEAN DEFAULT true NOT NULL
 );

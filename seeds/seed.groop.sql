@@ -5,16 +5,16 @@ TRUNCATE groop_groups RESTART IDENTITY CASCADE;
 TRUNCATE groop_groups_members RESTART IDENTITY CASCADE;
 TRUNCATE groop_tasks RESTART IDENTITY CASCADE;
 
-INSERT INTO groop_users (username, fullname, password, email)
+INSERT INTO groop_users (username, fullname, password, email, notifications)
 VALUES
   ('username1', 'first1 last1',
   -- password = 'pass' 
-    '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC', 'user1@email.com'),
-  ('username2', 'first2 last2', '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC', 'user2@email.com'),
-  ('username3', 'first3 last3', '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC', 'user3@email.com'),
-  ('username4', 'first4 last4', '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC', 'user4@email.com'),
-  ('username5', 'first5 last5', '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC', 'user5@email.com'),
-  ('username6', 'first6 last6', '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC','user6@email.com');
+    '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC', 'user1@email.com', false),
+  ('username2', 'first2 last2', '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC', 'user2@email.com', false),
+  ('username3', 'first3 last3', '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC', 'user3@email.com', false),
+  ('username4', 'first4 last4', '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC', 'user4@email.com', false),
+  ('username5', 'first5 last5', '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC', 'user5@email.com', false),
+  ('username6', 'first6 last6', '$2a$12$bbV7LrRWFzM27uJgcbxTpe9syDnuIGhaiNMDY/ty4m31r8GSSQzUC','user6@email.com', false);
 
 INSERT INTO groop_groups (name, owner_id)
 VALUES

@@ -7,6 +7,7 @@ const { transporter } = require('../mail-service');
 
 const usersRouter = express.Router();
 const jsonBodyParser = express.json();
+const { requireAuth } = require('../middleware/jwt-auth');
 
 usersRouter.post('/', jsonBodyParser, async (req, res, next) => {
   const { password, username, fullname, email } = req.body;
@@ -77,5 +78,79 @@ usersRouter.post('/', jsonBodyParser, async (req, res, next) => {
     next(error);
   }
 });
+
+usersRouter
+  .route('/')
+  .all(requireAuth)
+  .get(async (req, res, next) => {
+    res.status(200).json(UsersService.serializeUser(req.user));
+  })
+  .patch(jsonBodyParser, async (req, res, next) => {
+    const { fullname, password, email } = req.body;
+    let notifications = req.body.notifications
+      ? 'true'
+      : req.body.notifications === undefined
+      ? undefined
+      : 'false';
+
+    let updateInfo = {
+      fullname,
+      password,
+      email,
+      notifications,
+    };
+
+    const numOfValues = Object.values(updateInfo).filter(Boolean).length;
+    if (numOfValues == 0) {
+      return res.status(400).json({
+        error: {
+          message: `Request must include at least one item to edit: fullname, password, email, or notifications`,
+        },
+      });
+    }
+
+    if (email) {
+      // validate email
+      const emailError = UsersService.validateEmail(email);
+      if (emailError) return res.status(400).json({ error: emailError });
+
+      // validate email not already being used
+      const hasUserWithEmail = await UsersService.hasUserWithEmail(
+        req.app.get('db'),
+        email,
+      );
+      if (hasUserWithEmail)
+        return res.status(400).json({ error: 'Email is already being used' });
+    }
+
+    let hashedPassword;
+    if (password) {
+      // validate password strength
+      const passwordError = UsersService.validatePassword(password);
+      if (passwordError) return res.status(400).json({ error: passwordError });
+
+      hashedPassword = await UsersService.hashPassword(password);
+    }
+
+    updateInfo = {
+      ...updateInfo,
+      password: hashedPassword,
+      notifications: notifications === 'true' ? true : false,
+    };
+
+    try {
+      const updatedUser = await UsersService.updateUser(
+        req.app.get('db'),
+        req.user.id,
+        updateInfo,
+      );
+
+      if (updatedUser) {
+        res.status(200).json(UsersService.serializeUser(updatedUser));
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
 
 module.exports = usersRouter;
