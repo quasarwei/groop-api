@@ -18,6 +18,7 @@ const GroupsMembersService = {
         'u.username',
         'u.fullname',
         'u.email',
+        'u.notifications',
         'gm.group_id',
         'g.name',
       )

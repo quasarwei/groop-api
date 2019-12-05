@@ -8,6 +8,8 @@ const jsonParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
 const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
 
+const { transporter } = require('../mail-service');
+
 const taskFormat = task => ({
   id: task.id,
   name: xss(task.name),
@@ -212,12 +214,14 @@ tasksRouter
         const group_id = updatedTask.group_id;
 
         // get all member emails in tthe group
-        // that have email notifcations on (do later)
+        // that have email notifications turned on
         const groupUsers = await GroupsMembersService.getGroupMembers(
           req.app.get('db'),
           group_id,
         );
-        const emails = groupUsers.map(user => user.email);
+        const emails = groupUsers
+          .filter(user => user.notifications)
+          .map(user => user.email);
         let allMailOptions = emails.map(email => {
           // prettier-ignore
           return {
@@ -228,7 +232,7 @@ tasksRouter
             <section style="margin: 0 auto;">
               <div style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center; background-color: #363432; color: #fafafa; ">
                 <h2>Groop</h2>
-                <div style="height: 0; width: 200px; border: 1px solid #4a9afa;"></div>
+                <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
                 <h1>The following task has been updated</h1>
                 <div style="text-align: left;">
                   <p>${updatedTask.name}</p>
