@@ -92,14 +92,15 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
       });
 
   //prevent user from adding tasks for a group they are not a part of
-  const member_id = req.user.id;
   const groupMembership = await TasksService.checkGroupMembership(
     req.app.get('db'),
     group_id,
-    member_id,
+    req.user.id,
   );
   if (!groupMembership.length) {
-    return res.status(400).json({ error: `Not a valid request` });
+    return res
+      .status(400)
+      .json({ error: `Unauthorized request: Not a member of the group` });
   }
 
   //NEED: check to see if categoryId is valid for the groupId
@@ -139,7 +140,6 @@ tasksRouter
   .all(checkTaskExists)
   .all(checkUserGroup)
   .get(async (req, res, next) => {
-    //ADD: a user who is not part of the group should not be able to GET task by ID
     res.status(200).json(taskFormat(res.task));
   })
   .patch(jsonParser, async (req, res, next) => {
