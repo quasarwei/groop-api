@@ -25,6 +25,13 @@ const UsersService = {
       .returning('*')
       .then(([user]) => user);
   },
+  updateUser(db, id, updatedInfo) {
+    return db('groop_users')
+      .where({ id })
+      .update(updatedInfo)
+      .returning('*')
+      .then(rows => rows[0]);
+  },
   validatePassword(password) {
     if (password.length < 8) {
       return 'Password must be longer than 8 characters';
@@ -55,6 +62,7 @@ const UsersService = {
       fullname: xss(user.fullname),
       username: xss(user.username),
       email: xss(user.email),
+      notifications: user.notifications,
     };
   },
 };
