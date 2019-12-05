@@ -7,8 +7,7 @@ const groupsRouter = express.Router();
 const jsonParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
 const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
-const TaskCategoriesService = require('../tasks/task-categories-service.js');
-
+const TaskCategoriesService = require('../tasks/task-categories-service');
 
 const groupFormat = group => ({
   id: group.id,
