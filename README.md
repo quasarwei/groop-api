@@ -21,7 +21,7 @@
 | GET    | [/api/categories/group/:group_id]                                                    | Get all task categories for a group | Array of category objects | A / JSON      |
 | GET    | [/api/categories/:category_id]                                                       | Get a category by id                | Category object           | A / JSON      |
 | PATCH  | [/api/categories/:category_id]                                                       | Edit a category                     |                           | A / JSON      |
-| DELETE | [/api/categories/:category_id/:group_id]                                             | Delete a category                   | -                         | A             |
+| DELETE | [/api/categories/:category_id]                                                       | Delete a category                   | -                         | A             |
 | GET    | [/api/groups]                                                                        | Get a group                         | Group Object              | JSON          |
 | POST   | [/api/groups](#post-apigroups)                                                       | Create a group                      | Object                    | A / JSON      |
 | DELETE | [/api/groups/:group_id](#delete-apigroupsgroup_id)                                   | Delete a group                      | -                         | A             |
@@ -93,8 +93,6 @@ Get all tasks in a group
 #### `PATCH /api/tasks/task/:task_id`
 
 Edit a task
-
-- group_id is required in body
 
 ##### Path Parameter
 
