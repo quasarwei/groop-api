@@ -22,7 +22,6 @@ const taskFormat = task => ({
   category_id: task.category_id,
   priority: task.priority,
   time_start: task.time_start,
-  time_end: task.time_end,
 });
 
 // get all tasks that authorized user is assigned to
@@ -76,7 +75,6 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
     category_id,
     priority,
     time_start,
-    time_end,
   } = req.body;
 
   for (const field of [
@@ -118,7 +116,6 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
     category_id,
     priority,
     time_start,
-    time_end,
   };
   try {
     const newTask = await TasksService.postNewTask(
@@ -153,7 +150,6 @@ tasksRouter
       category_id,
       priority,
       time_start,
-      time_end,
     } = req.body;
     let completed = req.body.completed
       ? 'true'
@@ -169,7 +165,6 @@ tasksRouter
       category_id,
       priority,
       time_start,
-      time_end,
       completed,
     };
 
