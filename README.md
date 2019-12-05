@@ -71,7 +71,6 @@ Submit a new task to a group
 | category_id | Int    | id of category task belongs to                                            | Y         |
 | priority    | Int    | Priority level used for scoring purposes. (1 - Low, 2 - Medium, 3 - High) | Y         |
 | time_start  | String | start time for task                                                       | N         |
-| time_end    | String | optional end time for task                                                | N         |
 
 ##### OK Response Body
 
@@ -88,7 +87,6 @@ Submit a new task to a group
 | category_id      | Int    | id of category task belongs to                                            |
 | priority         | Int    | Priority level used for scoring purposes. (1 - Low, 2 - Medium, 3 - High) |
 | time_start       | String | optional start time for task                                              |
-| time_end         | String | optional end time for task                                                |
 
 #### `GET /api/tasks/:group_id`
 
@@ -130,7 +128,6 @@ Body must include at least one item to edit:
 | category_id      | Int    | Id of category task is to be assigned to |
 | priority         | Int    | Priority level of task                   |
 | time_start       | String | start time optional                      |
-| time_end         | String | end time optional                        |
 | completed        | Bool   | is task completed?                       |
 
 ##### OK Response Body
