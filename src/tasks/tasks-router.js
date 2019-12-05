@@ -153,7 +153,11 @@ tasksRouter
       time_start,
       time_end,
     } = req.body;
-    let completed = req.body.completed ? 'true' : 'false';
+    let completed = req.body.completed
+      ? 'true'
+      : req.body.completed === undefined
+      ? undefined
+      : 'false';
 
     let updateInfo = {
       name,

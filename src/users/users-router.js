@@ -109,10 +109,32 @@ usersRouter
       });
     }
 
-    // STILL NEED TO SALT PASSWORD IF UPDATING PASSWORD
+    if (email) {
+      // validate email
+      const emailError = UsersService.validateEmail(email);
+      if (emailError) return res.status(400).json({ error: emailError });
+
+      // validate email not already being used
+      const hasUserWithEmail = await UsersService.hasUserWithEmail(
+        req.app.get('db'),
+        email,
+      );
+      if (hasUserWithEmail)
+        return res.status(400).json({ error: 'Email is already being used' });
+    }
+
+    let hashedPassword;
+    if (password) {
+      // validate password strength
+      const passwordError = UsersService.validatePassword(password);
+      if (passwordError) return res.status(400).json({ error: passwordError });
+
+      hashedPassword = await UsersService.hashPassword(password);
+    }
 
     updateInfo = {
       ...updateInfo,
+      password: hashedPassword,
       notifications: notifications === 'true' ? true : false,
     };
 
