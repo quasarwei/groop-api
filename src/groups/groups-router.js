@@ -7,6 +7,8 @@ const groupsRouter = express.Router();
 const jsonParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
 const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
+const TaskCategoriesService = require('./task-categories-service.js');
+
 
 const groupFormat = group => ({
   id: group.id,
@@ -36,6 +38,16 @@ groupsRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
       req.app.get('db'),
       newGroup.id,
       newGroup.owner_id,
+    );
+
+    //establish a generic starting category to appear in post-new-task form
+    const category_name = "General";
+    const group_id = newGroup.id;
+    const newCategoryInfo = { category_name, group_id };
+
+    const starterCategory = await TaskCategoriesService.postNewCategory(
+      req.app.get('db'),
+      newCategoryInfo,
     );
 
     res
