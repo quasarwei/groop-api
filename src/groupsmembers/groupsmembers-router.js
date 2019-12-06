@@ -25,27 +25,40 @@ groupsMembersRouter
       next(error);
     }
   })
-  // add a member to a group
-  // todo: check if user is already in the group
-  .post(jsonParser, async (req, res, next) => {
-    const { group_id, member_id } = req.body;
 
-    for (const field of ['group_id', 'member_id'])
+  // add a member to a group
+  .post(jsonParser, async (req, res, next) => {
+    const { group_id, username } = req.body;
+
+    for (const field of ['group_id', 'username'])
       if (!req.body[field])
         return res.status(400).json({
           error: `Missing '${field}' in request body`,
         });
 
+    const newMember = await UsersService.getUserByUsername(
+      req.app.get('db'),
+      username,
+    );
+
+    const oldGroupMembers = await GroupsMembersService.getGroupMembers(
+      req.app.get('db'),
+      group_id,
+    );
+
+    oldGroupMembers.forEach(member => {
+      if (member.username === username)
+        return res
+          .status(400)
+          .json({ error: `user ${username} is already a member of the group` });
+    });
+
     try {
       const newGroupMember = await GroupsMembersService.addGroupMember(
         req.app.get('db'),
         group_id,
-        member_id,
-      );
-
-      const newMember = await UsersService.getUser(
-        req.app.get('db'),
-        member_id,
+        newMember.id,
+        username,
       );
 
       const group = await GroupsService.getGroupById(
