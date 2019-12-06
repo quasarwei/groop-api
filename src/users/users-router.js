@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const UsersService = require('./users-service');
 const nodemailer = require('nodemailer');
-const { transporter } = require('../mail-service');
+const { transporter, sendMail } = require('../mail-service');
 
 const usersRouter = express.Router();
 const jsonBodyParser = express.json();
@@ -48,8 +48,17 @@ usersRouter.post('/', jsonBodyParser, async (req, res, next) => {
     to: email,                                                // list of receivers
     subject: 'Welcome to Groop - Registration Confirmation ', // subject line
     text: 'Thank you for signing up for Groop',               // plain text body
-    html:
-      '<h1>Thank you for signing up for Groop</h1><p>With your new account, you can now opt to receive email reminders for tasks created on the Groop website</p><p>13 Minutes</p>',
+    html: `
+    <section style="margin: 0 auto; background-color: #95a5a5;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center; background-color: #363432; color: #fafafa; ">
+        <h2>Groop</h2>
+        <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
+        <h1>Thank you for signing up for Groop</h1>
+        <div style="text-align: left;">
+          <p>With your new account, you can now opt to receive email reminders for tasks created on the Groop website</p>
+        </div>
+      </div>
+    </section>`
   };
 
     const hashedPassword = await UsersService.hashPassword(password);
@@ -60,15 +69,7 @@ usersRouter.post('/', jsonBodyParser, async (req, res, next) => {
       email,
     };
     const user = await UsersService.insertUser(req.app.get('db'), newUser);
-
-    // send confirmation email
-    let info = await transporter.sendMail(mailOptions, function(error, info) {
-      if (error) return false;
-      else {
-        console.log('Message sent: ' + info.response);
-        return true;
-      }
-    });
+    sendMail(mailOptions, transporter);
 
     res
       .status(201)

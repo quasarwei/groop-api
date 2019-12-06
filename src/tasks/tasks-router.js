@@ -2,13 +2,15 @@ const express = require('express');
 const path = require('path');
 const xss = require('xss');
 const TasksService = require('./tasks-service.js');
+const UsersService = require('../users/users-service');
 
 const tasksRouter = express.Router();
 const jsonParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
 const GroupsMembersService = require('../groupsmembers/groupsmembers-service');
+const GroupsService = require('../groups/groups-service');
 
-const { transporter } = require('../mail-service');
+const { transporter, sendMail } = require('../mail-service');
 
 const taskFormat = task => ({
   id: task.id,
@@ -182,6 +184,8 @@ tasksRouter
       completed: completed === 'true' ? true : false,
     };
 
+    const oldTask = await TasksService.getTaskById(req.app.get('db'), task_id);
+
     try {
       const updatedTask = await TasksService.updateTask(
         req.app.get('db'),
@@ -190,6 +194,21 @@ tasksRouter
       );
 
       if (updatedTask) {
+        let task_priority = '';
+        if (updatedTask.priority === 1) task_priority = 'low';
+        if (updatedTask.priority === 2) task_priority = 'medium';
+        if (updatedTask.priority === 3) task_priority = 'high';
+
+        const starttime =
+          updatedTask.time_start == null ? 'none' : updatedTask.time_start;
+
+        const group = await GroupsService.getGroupById(
+          req.app.get('db'),
+          updatedTask.group_id,
+        );
+        let groupname = group.name;
+
+        // scoring
         const newScore = await GroupsMembersService.calculateScore(
           req.app.get('db'),
           updatedTask.group_id,
@@ -206,33 +225,145 @@ tasksRouter
           { score },
         );
 
-        const group_id = updatedTask.group_id;
+        // send email to newly assigned user
+        if (oldTask.user_assigned_id !== updatedTask.user_assigned_id) {
+          const newAssignedUser = await UsersService.getUser(
+            req.app.get('db'),
+            updatedTask.user_assigned_id,
+          );
 
-        // get all member emails in tthe group
+          let mailOption = {
+            from: '"13 Minutes" <groopnotify@gmail.com>',
+            to: newAssignedUser.email,
+            subject: `You've been assigned a task`,
+            html: `
+        <section style="margin: 0 auto; background-color: #95a5a5;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center; background-color: #363432; color: #fafafa; ">
+            <h2>Groop</h2>
+            <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
+            <h1>You've been assigned a task ${updatedTask.name}</h1>
+            <div style="text-align: left;">
+              <p>Description: ${updatedTask.description}</p>
+              <p>Date due: ${updatedTask.date_due}</p>
+              <p>Start time: ${starttime}</p>
+              <p>Priority: ${task_priority}</p>
+              <p>Group: ${groupname}</p>
+            </div>
+          </div>
+        </section>`,
+          };
+          if (newAssignedUser.notifications) sendMail(mailOption, transporter);
+        }
+
+        // send task completed email to group
+        if (oldTask.completed !== updatedTask.completed) {
+          const assignedUser = await UsersService.getUser(
+            req.app.get('db'),
+            updatedTask.user_assigned_id,
+          );
+          const group_id = updatedTask.group_id;
+
+          // get all member emails in tthe group
+          // that have email notifications turned on
+          const groupUsers = await GroupsMembersService.getGroupMembers(
+            req.app.get('db'),
+            group_id,
+          );
+
+          if (updatedTask.completed) {
+            const emails = groupUsers
+              .filter(user => user.notifications)
+              .map(user => user.email);
+            let allMailOptions = emails.map(email => {
+              return {
+                from: '"13 Minutes" <groopnotify@gmail.com>',
+                to: email,
+                subject: `Task '${updatedTask.name}' has been completed by ${assignedUser.username}`,
+                // prettier-ignore
+                html: `
+            <section style="margin: 0 auto; background-color: #95a5a5;">
+              <div style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center; background-color: #363432; color: #fafafa; ">
+                <h2>Groop</h2>
+                <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
+                <h1>The task <i>${updatedTask.name}</i> has been completed by ${assignedUser.username}</h1>
+                <div style="text-align: left;">
+                </div>
+              </div>
+            </section>`
+              };
+            });
+
+            allMailOptions.forEach(async mailOption => {
+              return sendMail(mailOption, transporter);
+            });
+          } else {
+            const emails = groupUsers
+              .filter(user => user.notifications)
+              .map(user => user.email);
+            let allMailOptions = emails.map(email => {
+              return {
+                from: '"13 Minutes" <groopnotify@gmail.com>',
+                to: email,
+                subject: `Task '${updatedTask.name}' has been marked as incomplete`,
+                // prettier-ignore
+                html: `
+            <section style="margin: 0 auto; background-color: #95a5a5;">
+              <div style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center; background-color: #363432; color: #fafafa; ">
+                <h2>Groop</h2>
+                <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
+                <h1>The task <i>${updatedTask.name}</i> has been marked as incomplete</h1>
+                <div style="text-align: left;">
+                </div>
+              </div>
+            </section>`
+              };
+            });
+
+            allMailOptions.forEach(async mailOption => {
+              return sendMail(mailOption, transporter);
+            });
+          }
+          return res.status(200).json(taskFormat(updatedTask));
+        }
+
+        // send task has been updated email to group
+        const group_id = updatedTask.group_id;
+        let newAssignedUserId;
+        if (oldTask.user_assigned_id !== updatedTask.user_assigned_id) {
+          newAssignedUserId = updatedTask.user_assigned_id;
+        }
+
+        // get all member emails in the group
         // that have email notifications turned on
         const groupUsers = await GroupsMembersService.getGroupMembers(
           req.app.get('db'),
           group_id,
         );
         const emails = groupUsers
-          .filter(user => user.notifications)
+          .filter(user => {
+            if (user.id === newAssignedUserId) return false;
+            if (user.notifications) return true;
+            return false;
+          })
           .map(user => user.email);
         let allMailOptions = emails.map(email => {
           // prettier-ignore
           return {
             from: '"13 Minutes" <groopnotify@gmail.com>',
             to: email,
-            subject: `Task ${updatedTask.name} has been updated`,
+            subject: `Task '${updatedTask.name}' has been updated`,
             html: `
-            <section style="margin: 0 auto;">
+            <section style="margin: 0 auto; background-color: #95a5a5;">
               <div style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center; background-color: #363432; color: #fafafa; ">
                 <h2>Groop</h2>
                 <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
-                <h1>The following task has been updated</h1>
+                <h1>The task ${updatedTask.name} has been updated</h1>
                 <div style="text-align: left;">
-                  <p>${updatedTask.name}</p>
-                  <p>${updatedTask.description}</p>
-                  <p>completed: ${updatedTask.completed}</p>
+                  <p>Description: ${updatedTask.description}</p>
+                  <p>Date due: ${updatedTask.date_due}</p>
+                  <p>Start time: ${starttime}</p>
+                  <p>Priority: ${task_priority}</p>
+                  <p>Group: ${groupname}</p>
                 </div>
               </div>
             </section>`
@@ -240,16 +371,7 @@ tasksRouter
         });
 
         allMailOptions.forEach(async mailOption => {
-          return (info = await transporter.sendMail(mailOption, function(
-            error,
-            info,
-          ) {
-            if (error) return false;
-            else {
-              console.log('Message sent: ' + info.response);
-              return true;
-            }
-          }));
+          return sendMail(mailOption, transporter);
         });
 
         res.status(200).json(taskFormat(updatedTask));
