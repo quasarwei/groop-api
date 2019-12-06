@@ -32,6 +32,12 @@ const UsersService = {
       .returning('*')
       .then(rows => rows[0]);
   },
+  getUser(db, id) {
+    return db('groop_users')
+      .select('id', 'username', 'fullname', 'email', 'notifications')
+      .where({ id })
+      .first();
+  },
   validatePassword(password) {
     if (password.length < 8) {
       return 'Password must be longer than 8 characters';

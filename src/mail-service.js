@@ -11,4 +11,14 @@ let transporter = nodemailer.createTransport({
   },
 });
 
-module.exports = { transporter };
+sendMail = async (mailOption, transport) => {
+  const info = await transport.sendMail(mailOption, function(error, info) {
+    if (error) return false;
+    else {
+      console.log('Message sent: ' + info.response);
+      return true;
+    }
+  });
+};
+
+module.exports = { transporter, sendMail };

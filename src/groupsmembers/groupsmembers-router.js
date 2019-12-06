@@ -1,11 +1,14 @@
 const express = require('express');
 const path = require('path');
 const xss = require('xss');
-const GroupsMembersService = require('./groupsmembers-service.js');
 
 const groupsMembersRouter = express.Router();
 const jsonParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
+const { transporter, sendMail } = require('../mail-service');
+const UsersService = require('../users/users-service');
+const GroupsService = require('../groups/groups-service');
+const GroupsMembersService = require('./groupsmembers-service.js');
 
 groupsMembersRouter
   .route('/')
@@ -39,6 +42,34 @@ groupsMembersRouter
         group_id,
         member_id,
       );
+
+      const newMember = await UsersService.getUser(
+        req.app.get('db'),
+        member_id,
+      );
+
+      const group = await GroupsService.getGroupById(
+        req.app.get('db'),
+        group_id,
+      );
+
+      let mailOption = {
+        from: '"13 Minutes" <groopnotify@gmail.com>',
+        to: newMember.email,
+        subject: `You've been added to a new group`,
+        html: `
+        <section style="margin: 0 auto; background-color: #95a5a5;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center; background-color: #363432; color: #fafafa; ">
+            <h2>Groop</h2>
+            <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
+            <h1>You've been added to the group <i>${group.name}</i></h1>
+            <div style="text-align: left;">
+            </div>
+          </div>
+        </section>`,
+      };
+
+      if (newMember.notifications) sendMail(mailOption, transporter);
 
       res
         .status(201)
@@ -77,6 +108,34 @@ groupsMembersRouter.delete(
         group_id,
         member_id,
       );
+
+      const deletedMemberInfo = await UsersService.getUser(
+        req.app.get('db'),
+        member_id,
+      );
+
+      const group = await GroupsService.getGroupById(
+        req.app.get('db'),
+        group_id,
+      );
+
+      let mailOption = {
+        from: '"13 Minutes" <groopnotify@gmail.com>',
+        to: deletedMemberInfo.email,
+        subject: `You've been removed from a group`,
+        html: `
+        <section style="margin: 0 auto; background-color: #95a5a5;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 2rem; text-align: center; background-color: #363432; color: #fafafa; ">
+            <h2>Groop</h2>
+            <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
+            <h1>You've been removed from the group <i>${group.name}</i></h1>
+            <div style="text-align: left;">
+            </div>
+          </div>
+        </section>`,
+      };
+      if (deletedMemberInfo.notifications) sendMail(mailOption, transporter);
+
       res.status(204).end();
     } catch (error) {
       next(error);

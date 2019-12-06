@@ -15,6 +15,7 @@ const GroupsMembersService = {
       .select(
         'gm.member_id',
         'gm.score',
+        'u.id',
         'u.username',
         'u.fullname',
         'u.email',
