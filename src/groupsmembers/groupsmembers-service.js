@@ -1,7 +1,7 @@
 const GroupsMembersService = {
-  addGroupMember(knex, group_id, member_id) {
+  addGroupMember(knex, group_id, member_id, username) {
     return knex('groop_groups_members')
-      .insert({ group_id, member_id })
+      .insert({ group_id, member_id, username })
       .returning('*')
       .then(rows => rows[0]);
   },

@@ -23,23 +23,23 @@ VALUES
     ('group3', 4),
     ('group4', 1);
 
-INSERT INTO groop_groups_members (group_id, member_id) 
+INSERT INTO groop_groups_members (group_id, member_id, username) 
 VALUES
-    (1, 1),
-    (1, 3),
-    (1, 4),
-    (2, 1),
-    (2, 3),
-    (2, 4),
-    (2, 6),
-    (3, 2),
-    (3, 3),
-    (3, 4),
-    (3, 5),
-    (4, 1),
-    (4, 2),
-    (4, 3),
-    (4, 4);
+    (1, 1, 'username1'),
+    (1, 3, 'username3'),
+    (1, 4, 'username4'),
+    (2, 1, 'username1'),
+    (2, 3, 'username3'),
+    (2, 4, 'username4'),
+    (2, 6, 'username6'),
+    (3, 2, 'username2'),
+    (3, 3, 'username3'),
+    (3, 4, 'username4'),
+    (3, 5, 'username5'),
+    (4, 1, 'username1'),
+    (4, 2, 'username2'),
+    (4, 3, 'username3'),
+    (4, 4, 'username4');
 
 INSERT INTO groop_task_categories (category_name, group_id)
 VALUES
