@@ -42,6 +42,15 @@ const TasksService = {
       .select('*')
       .where({ group_id, member_id });
   },
+  getTasksWithinWeek(knex, user_assigned_id) {
+    let today = new Date();
+    let newdate = new Date();
+    newdate.setDate(today.getDate() + 7);
+    return knex('groop_tasks')
+      .where({ user_assigned_id })
+      .whereBetween('date_due', [today, newdate])
+      .orderBy('date_due', 'ascending');
+  },
 };
 
 module.exports = TasksService;
