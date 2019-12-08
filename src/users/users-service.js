@@ -44,6 +44,12 @@ const UsersService = {
       .where({ username })
       .first();
   },
+  getUsersWithNotifications(db) {
+    return db('groop_users')
+      .select('id', 'username', 'email')
+      .where('notifications', true)
+      .orderBy('id', 'ascending');
+  },
   validatePassword(password) {
     if (password.length < 8) {
       return 'Password must be longer than 8 characters';

@@ -12,6 +12,9 @@ const groupsMembersRouter = require('./groupsmembers/groupsmembers-router');
 const tasksRouter = require('./tasks/tasks-router');
 const taskCategoriesRouter = require('./tasks/task-categories-router');
 
+let CronJob = require('cron').CronJob;
+const sendWeeklyMail = require('./mail/weeklymail');
+
 const app = express();
 
 const morganOption = NODE_ENV === 'production' ? 'tiny' : 'common';
@@ -31,6 +34,8 @@ app.use('/api/groups', groupsRouter);
 app.use('/api/groupsmembers', groupsMembersRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/categories', taskCategoriesRouter);
+
+new CronJob('0 12 * * Sun', sendWeeklyMail, null, true, 'America/Los_Angeles');
 
 app.use(function errorHandler(error, req, res, next) {
   //eslint-disable-line no-unused-vars
