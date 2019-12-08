@@ -104,7 +104,6 @@ taskCategoriesRouter
         req.app.get('db'),
         category_id,
       );
-      console.log(deletedCategory);
       res.status(204).end();
     } catch (error) {
       next(error);

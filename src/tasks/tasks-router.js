@@ -388,7 +388,6 @@ tasksRouter
         req.app.get('db'),
         task_id,
       );
-      console.log(deletedItem);
       res.status(204).end();
     } catch (error) {
       next(error);
