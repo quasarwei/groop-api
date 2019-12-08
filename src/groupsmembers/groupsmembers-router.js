@@ -40,6 +40,11 @@ groupsMembersRouter
       req.app.get('db'),
       username,
     );
+    if (!newMember) {
+      return res.status(400).json({
+        error: `User doesn't exist`,
+      });
+    }
 
     const oldGroupMembers = await GroupsMembersService.getGroupMembers(
       req.app.get('db'),
