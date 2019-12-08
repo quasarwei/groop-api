@@ -37,6 +37,7 @@ groupsRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
       req.app.get('db'),
       newGroup.id,
       newGroup.owner_id,
+      req.user.username,
     );
 
     //establish a generic starting category to appear in post-new-task form
@@ -63,7 +64,13 @@ groupsRouter
   .all(requireAuth)
   .all(checkGroupExists)
   .get(async (req, res, next) => {
-    if (res.group.owner_id != req.user.id)
+    const userGroups = await GroupsMembersService.checkMembership(
+      req.app.get('db'),
+      req.user.id,
+      res.group.id,
+    );
+
+    if (!userGroups)
       return res.status(401).json({
         error:
           'Unauthorized request. A group can only be retrieved by a member of the group',

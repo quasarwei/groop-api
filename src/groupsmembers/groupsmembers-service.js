@@ -35,6 +35,12 @@ const GroupsMembersService = {
       .leftJoin('groop_groups AS g', 'g.id', 'gm.group_id')
       .where({ member_id });
   },
+  checkMembership(knex, member_id, group_id) {
+    return knex('groop_groups_members')
+      .select('*')
+      .where({ member_id, group_id })
+      .first();
+  },
   calculateScore(knex, group_id, user_assigned_id) {
     return knex
       .sum({ score: 'priority' })

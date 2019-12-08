@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const UsersService = require('./users-service');
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
 const { transporter, sendMail } = require('../mail-service');
 
 const usersRouter = express.Router();
@@ -149,6 +150,28 @@ usersRouter
       if (updatedUser) {
         res.status(200).json(UsersService.serializeUser(updatedUser));
       }
+    } catch (error) {
+      next(error);
+    }
+  });
+
+usersRouter
+  .route('/verify')
+  .all(requireAuth)
+  .post(jsonBodyParser, async (req, res, next) => {
+    const { password } = req.body;
+    if (!password)
+      return res.status(400).json({
+        error: `Must enter password`,
+      });
+    try {
+      const verified = await bcrypt.compare(password, req.user.password);
+      if (!verified) {
+        return res.status(400).json({
+          error: `Incorrect password`,
+        });
+      }
+      return res.status(204).end();
     } catch (error) {
       next(error);
     }
