@@ -10,6 +10,10 @@ const usersRouter = require('./users/users-router');
 const groupsRouter = require('./groups/groups-router');
 const groupsMembersRouter = require('./groupsmembers/groupsmembers-router');
 const tasksRouter = require('./tasks/tasks-router');
+const taskCategoriesRouter = require('./tasks/task-categories-router');
+
+let CronJob = require('cron').CronJob;
+const sendWeeklyMail = require('./mail/weeklymail');
 
 const app = express();
 
@@ -21,7 +25,7 @@ app.use(cors());
 
 app.get('/', (req, res, next) => {
   console.log('welcome');
-  res.status(200).json({ message: 'welcome' });
+  res.status(200).send('Hello, groups!');
 });
 
 app.use('/api/auth', authRouter);
@@ -29,6 +33,9 @@ app.use('/api/users', usersRouter);
 app.use('/api/groups', groupsRouter);
 app.use('/api/groupsmembers', groupsMembersRouter);
 app.use('/api/tasks', tasksRouter);
+app.use('/api/categories', taskCategoriesRouter);
+
+new CronJob('0 12 * * Sun', sendWeeklyMail, null, true, 'America/Los_Angeles');
 
 app.use(function errorHandler(error, req, res, next) {
   //eslint-disable-line no-unused-vars
