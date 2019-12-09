@@ -243,11 +243,12 @@ tasksRouter
             <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
             <h1>You've been assigned a task ${updatedTask.name}</h1>
             <div style="text-align: left;">
-              <p>Description: ${updatedTask.description}</p>
-              <p>Date due: ${updatedTask.date_due}</p>
-              <p>Start time: ${starttime}</p>
-              <p>Priority: ${task_priority}</p>
-              <p>Group: ${groupname}</p>
+              <h4>${updatedTask.name}</h4>
+              <p style="margin: 0 16px;">Description: ${updatedTask.description}</p>
+              <p style="margin: 0 16px;">Date due: ${updatedTask.date_due}</p>
+              <p style="margin: 0 16px;">Start time: ${starttime}</p>
+              <p style="margin: 0 16px;">Priority: ${task_priority}</p>
+              <p style="margin: 0 16px;">Group: ${groupname}</p>
             </div>
           </div>
         </section>`,
@@ -359,11 +360,11 @@ tasksRouter
                 <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
                 <h1>The task ${updatedTask.name} has been updated</h1>
                 <div style="text-align: left;">
-                  <p>Description: ${updatedTask.description}</p>
-                  <p>Date due: ${updatedTask.date_due}</p>
-                  <p>Start time: ${starttime}</p>
-                  <p>Priority: ${task_priority}</p>
-                  <p>Group: ${groupname}</p>
+                  <p style="margin: 0 16px;">Description: ${updatedTask.description}</p>
+                  <p style="margin: 0 16px;">Date due: ${updatedTask.date_due}</p>
+                  <p style="margin: 0 16px;">Start time: ${starttime}</p>
+                  <p style="margin: 0 16px;">Priority: ${task_priority}</p>
+                  <p style="margin: 0 16px;">Group: ${groupname}</p>
                 </div>
               </div>
             </section>`

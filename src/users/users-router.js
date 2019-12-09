@@ -56,7 +56,7 @@ usersRouter.post('/', jsonBodyParser, async (req, res, next) => {
         <div style="height: 0; width: 200px; margin: 0 auto; border: 1px solid #4a9afa;"></div>
         <h1>Thank you for signing up for Groop</h1>
         <div style="text-align: left;">
-          <p>With your new account, you can now opt to receive email reminders for tasks created on the Groop website</p>
+          <p style="margin: 0 16px;">With your new account, you can now opt to receive email reminders for tasks created on the Groop website</p>
         </div>
       </div>
     </section>`
