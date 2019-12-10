@@ -3,6 +3,7 @@ const helpers = require('./test-helpers');
 
 describe('users endpoints', function() {
   let db;
+
   const testUsers = helpers.makeUsersArray();
   const testUser = testUsers[0];
 
@@ -10,11 +11,12 @@ describe('users endpoints', function() {
     db = helpers.makeKnexInstance();
     app.set('db', db);
   });
+
   after('disconnect from db', () => db.destroy());
   before('cleanup', () => helpers.cleanTables(db));
   afterEach('cleanup', () => helpers.cleanTables(db));
 
-  describe('POST /api/user', () => {
+  describe('POST /api/users', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
 
     const requiredFields = ['fullname', 'username', 'password', 'email'];
@@ -24,15 +26,15 @@ describe('users endpoints', function() {
         fullname: 'test name',
         username: 'test username',
         password: 'test password',
-        email: 'testemail@email.com'
+        email: 'testemail@email.com',
       };
 
       it(`responds with 400 required error when '${field}' is missing`, () => {
         delete registerAttemptBody[field];
         return supertest(app)
-          .post('/api/user')
+          .post('/api/users')
           .send(registerAttemptBody)
-          .expect(400, { error: `Missing '${field}' in request body`, });
+          .expect(400, { error: `Missing '${field}' in request body` });
       });
     });
 
@@ -41,10 +43,10 @@ describe('users endpoints', function() {
         fullname: 'test name',
         username: 'test username',
         password: '1234567',
-        email: 'testemail@email.com'
+        email: 'testemail@email.com',
       };
       return supertest(app)
-        .post('/api/user')
+        .post('/api/users')
         .send(userShortPassword)
         .expect(400, { error: 'Password must be longer than 8 characters' });
     });
@@ -54,10 +56,10 @@ describe('users endpoints', function() {
         fullname: 'test name',
         username: 'test username',
         password: '*'.repeat(73),
-        email: 'testemail@email.com'
+        email: 'testemail@email.com',
       };
       return supertest(app)
-        .post('/api/user')
+        .post('/api/users')
         .send(userLongPassword)
         .expect(400, { error: 'Password must be less than 72 characters' });
     });
@@ -66,42 +68,46 @@ describe('users endpoints', function() {
       const userPasswordStartsSpaces = {
         fullname: 'test name',
         username: 'test username',
-        password:  ' 1Aa!2Bb@',
-        email: 'testemail@email.com'
+        password: ' 1Aa!2Bb@',
+        email: 'testemail@email.com',
       };
       return supertest(app)
-        .post('/api/user')
+        .post('/api/users')
         .send(userPasswordStartsSpaces)
-        .expect(400, { error: 'Password must not start or end with empty spaces' });
+        .expect(400, {
+          error: 'Password must not start or end with empty spaces',
+        });
     });
 
     it('responds with 400 error when password ends with spaces', () => {
       const userPasswordEndsSpaces = {
         fullname: 'test name',
         username: 'test username',
-        password:  '1Aa!2Bb@ ',
-        email: 'testemail@email.com'
+        password: '1Aa!2Bb@ ',
+        email: 'testemail@email.com',
       };
       return supertest(app)
-        .post('/api/user')
+        .post('/api/users')
         .send(userPasswordEndsSpaces)
-        .expect(400, { error: 'Password must not start or end with empty spaces' });
+        .expect(400, {
+          error: 'Password must not start or end with empty spaces',
+        });
     });
 
     it('responds with 400 error when password is not complex enough', () => {
       const userPasswordNotComplex = {
         fullname: 'test name',
         username: 'test username',
-        password:  '11AAaabb',
-        email: 'testemail@email.com'
+        password: '11AAaabb',
+        email: 'testemail@email.com',
       };
       return supertest(app)
-        .post('/api/user')
+        .post('/api/users')
         .send(userPasswordNotComplex)
-        .expect(400, { error: 'Password must contain one upper case, lower case, number and special character' });
+        .expect(400, {
+          error:
+            'Password must contain one upper case, lower case, number and special character',
+        });
     });
-
   });
-
-
 });
