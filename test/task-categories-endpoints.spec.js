@@ -1,3 +1,4 @@
+const knex = require('knex');
 const app = require('../src/app.js');
 const helpers = require('./test-helpers');
 
@@ -16,7 +17,7 @@ let testCategories = [
   },
 ];
 
-describe.skip('Task-category Endpoints', () => {
+describe('Task-category Endpoints', () => {
   let db;
 
   before('make knex instance', () => {
@@ -30,7 +31,7 @@ describe.skip('Task-category Endpoints', () => {
 
   describe('GET /api/categories', () => {
     context('Given no categories', () => {
-      it('responds with 200 and an empty list', () => {
+      it.skip('responds with 200 and an empty list', () => {
         return supertest(app)
           .get('/api/categories/group/1')
           .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
@@ -43,7 +44,7 @@ describe.skip('Task-category Endpoints', () => {
         return db.into('groop_task_categories').insert(testCategories);
       });
 
-      it('gets the categories from the database', () => {
+      it.skip('gets the categories from the database', () => {
         const expectedCategories = [
           { category_name: 'Test-category1', group_id: 1 },
           { category_name: 'Test-category2', group_id: 1 },
@@ -59,7 +60,7 @@ describe.skip('Task-category Endpoints', () => {
 
   describe('GET /api/categories/:category_id', () => {
     context('Given no categories', () => {
-      it('responds with 500', () => {
+      it.skip('responds with 500', () => {
         return supertest(app)
           .get('/api/categories/5')
           .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
@@ -72,14 +73,14 @@ describe.skip('Task-category Endpoints', () => {
         return db.into('groop_task_categories').insert(testCategories);
       });
 
-      it('responds with 404 if category is not found', () => {
+      it.skip('responds with 404 if category is not found', () => {
         return supertest(app)
           .get('/api/categories/9')
           .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
           .expect(404, { error: { message: `Category doesn't exist` } });
       });
 
-      it('responds with 200 and the specified category', () => {
+      it.skip('responds with 200 and the specified category', () => {
         const categoryId = 2;
         const expectedCategory = testCategories[categoryId - 1];
         return supertest(app)
@@ -92,7 +93,7 @@ describe.skip('Task-category Endpoints', () => {
 
   describe('DELETE /api/categories/:id', () => {
     context('Given no categories', () => {
-      it('responds 404 when category does not exist', () => {
+      it.skip('responds 404 when category does not exist', () => {
         return supertest(app)
           .delete('/api/categories/1')
           .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
@@ -105,7 +106,7 @@ describe.skip('Task-category Endpoints', () => {
         return db.into('groop_task_categories').insert(testCategories);
       });
 
-      it('removes the category by ID from the database', () => {
+      it.skip('removes the category by ID from the database', () => {
         const idToRemove = 2;
 
         let expectedCategories = [
@@ -135,7 +136,7 @@ describe.skip('Task-category Endpoints', () => {
     });
   });
 
-  describe('POST /api/categories', () => {
+  describe.skip('POST /api/categories', () => {
     it('responds with 400 missing group_id if not supplied', () => {
       const requestBody = {
         category_name: 'Testing Category',
