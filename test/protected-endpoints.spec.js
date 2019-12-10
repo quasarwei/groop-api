@@ -12,7 +12,7 @@ describe('Protected Endpoints', function() {
     testCategories,
   } = helpers.makeAllFixtures();
 
-  const [testUser] = testUsers;
+  const testUser = testUsers[0];
 
   before('make knex instance', () => {
     db = helpers.makeKnexInstance();
@@ -45,21 +45,6 @@ describe('Protected Endpoints', function() {
       path: '/api/groupsmembers',
       method: supertest(app).get,
     },
-    // {
-    //   name: 'GET /api/language/head',
-    //   path: '/api/language/head',
-    //   method: supertest(app).get,
-    // },
-    // {
-    //   name: 'POST /api/language/guess',
-    //   path: '/api/language/guess',
-    //   method: supertest(app).post,
-    // },
-    // {
-    //   name: 'PUT /api/auth/token',
-    //   path: '/api/auth/token',
-    //   method: supertest(app).put,
-    // },
   ];
 
   protectedEndpoints.forEach(endpoint => {
