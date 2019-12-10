@@ -1,7 +1,7 @@
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('groups endpoints', function() {
+describe.skip('groups endpoints', function() {
   let db;
 
   const testUsers = helpers.makeUsersArray();

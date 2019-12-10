@@ -108,7 +108,7 @@ function makeTasks() {
       id: 3,
       name: 'task 3',
       description: 'task 3 description',
-      completed: true,
+      completed: false,
       creator_id: 1,
       date_due: new Date('2020-01-02T00:00:00.615Z'),
       group_id: 1,
