@@ -20,7 +20,7 @@ describe('groups endpoints', function() {
 
   describe('POST /api/groups', () => {
     beforeEach('insert users, groups, and groupsmembers', () =>
-      helpers.seedGroups(db, testUsers, testGroups, testGroupsMembers),
+      helpers.seedGroups(db, testUsers, testGroups, testGroupsMembers)
     );
 
     it(`responds with 400 required error when 'name' is missing`, () => {

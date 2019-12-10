@@ -149,14 +149,14 @@ describe('Task-category Endpoints', () => {
         ),
       );
 
-      it.skip('responds with 404 if category is not found', () => {
+      it('responds with 404 if category is not found', () => {
         return supertest(app)
           .get('/api/categories/9')
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(404, { error: `Category doesn't exist` });
       });
 
-      it.skip('responds with 200 and the specified category', () => {
+      it('responds with 200 and the specified category', () => {
         const categoryId = 2;
         const expectedCategory = testCategories[categoryId - 1];
         return supertest(app)
