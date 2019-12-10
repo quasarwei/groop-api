@@ -128,7 +128,7 @@ function makeTasks() {
       user_assigned_id: 2,
       priority: 1,
       time_start: new Date('2019-12-22T00:00:00.615Z'),
-      category_id: 2,
+      category_id: null,
     },
   ];
 }
@@ -143,12 +143,12 @@ function makeTaskCategories() {
     {
       id: 2,
       category_name: 'category 2',
-      group_id: 2,
+      group_id: 1,
     },
     {
       id: 3,
       category_name: 'category 3',
-      group_id: 2,
+      group_id: 1,
     },
   ];
 }
