@@ -17,9 +17,13 @@ const sendWeeklyMail = require('./mail/weeklymail');
 
 const app = express();
 
-const morganOption = NODE_ENV === 'production' ? 'tiny' : 'common';
+const morganOption =
+  (NODE_ENV === 'production' ? 'tiny' : 'common',
+  {
+    skip: () => NODE_ENV === 'test',
+  });
 
-app.use(morgan(morganOption));
+app.use(morgan('combined', morganOption));
 app.use(helmet());
 app.use(cors());
 
