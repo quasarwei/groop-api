@@ -147,7 +147,7 @@ describe('tasks endpoints', function() {
           expect(res.body.completed).to.eql(false);
           expect(res.body.creator_id).to.eql(testUser.id);
           expect(res.body.group_id).to.eql(newTask.group_id);
-          expect(res.body.user_assigned_id).to.eql(testUser.id);
+          expect(res.body.user_assigned_id).to.eql(null);
           expect(res.body.priority).to.eql(newTask.priority);
           expect(res.body.category_id).to.eql(newTask.category_id);
 
@@ -172,7 +172,7 @@ describe('tasks endpoints', function() {
               expect(res.body.completed).to.eql(false);
               expect(res.body.creator_id).to.eql(testUser.id);
               expect(res.body.group_id).to.eql(newTask.group_id);
-              expect(res.body.user_assigned_id).to.eql(testUser.id);
+              expect(res.body.user_assigned_id).to.eql(null);
               expect(res.body.priority).to.eql(newTask.priority);
               expect(res.body.category_id).to.eql(newTask.category_id);
               const expectedDD = new Date(newTask.date_due).toLocaleString();
