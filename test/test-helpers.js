@@ -108,7 +108,7 @@ function makeTasks() {
       id: 3,
       name: 'task 3',
       description: 'task 3 description',
-      completed: true,
+      completed: false,
       creator_id: 1,
       date_due: new Date('2020-01-02T00:00:00.615Z'),
       group_id: 1,
@@ -128,7 +128,7 @@ function makeTasks() {
       user_assigned_id: 2,
       priority: 1,
       time_start: new Date('2019-12-22T00:00:00.615Z'),
-      category_id: 2,
+      category_id: null,
     },
   ];
 }
@@ -143,12 +143,12 @@ function makeTaskCategories() {
     {
       id: 2,
       category_name: 'category 2',
-      group_id: 2,
+      group_id: 1,
     },
     {
       id: 3,
       category_name: 'category 3',
-      group_id: 2,
+      group_id: 1,
     },
   ];
 }
@@ -225,32 +225,32 @@ async function seedGroups(db, users, groups, groupsmembers) {
   await db.transaction(async trx => {
     await trx.into('groop_groups').insert(groups);
     await trx.into('groop_groups_members').insert(groupsmembers);
-  });
 
-  await Promise.all([
-    trx.raw(`SELECT setval('groop_groups_id_seq', ?)`, [
-      groups[groups.length - 1].id,
-    ]),
-    trx.raw(`SELECT setval('groop_groups_members_id_seq', ?)`, [
-      groupsmembers[groupsmembers.length - 1].id,
-    ]),
-  ]);
+    await Promise.all([
+      trx.raw(`SELECT setval('groop_groups_id_seq', ?)`, [
+        groups[groups.length - 1].id,
+      ]),
+      trx.raw(`SELECT setval('groop_groups_members_id_seq', ?)`, [
+        groupsmembers[groupsmembers.length - 1].id,
+      ]),
+    ]);
+  });
 }
 
 async function seedTasks(db, tasks, categories) {
   await db.transaction(async trx => {
     await trx.into('groop_task_categories').insert(categories);
     await trx.into('groop_tasks').insert(tasks);
-  });
 
-  await Promise.all([
-    trx.raw(`SELECT setval('groop_tasks_id_seq', ?)`, [
-      tasks[tasks.length - 1].id,
-    ]),
-    trx.raw(`SELECT setval('groop_task_categories_id_seq', ?)`, [
-      categories[categories.length - 1].id,
-    ]),
-  ]);
+    await Promise.all([
+      trx.raw(`SELECT setval('groop_tasks_id_seq', ?)`, [
+        tasks[tasks.length - 1].id,
+      ]),
+      trx.raw(`SELECT setval('groop_task_categories_id_seq', ?)`, [
+        categories[categories.length - 1].id,
+      ]),
+    ]);
+  });
 }
 
 async function seedAll(db, users, groups, groupsmembers, tasks, categories) {
