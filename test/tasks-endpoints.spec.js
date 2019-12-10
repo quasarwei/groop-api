@@ -235,7 +235,7 @@ describe('tasks endpoints', function() {
         testCategories,
       ),
     );
-    it('responds 204, no content', () => {
+    it('responds 200 and returns updated task', () => {
       const updatedTask = { completed: true, name: 'new task title' };
       const expectedTask = {
         ...testTasks[0],

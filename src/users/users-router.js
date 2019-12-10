@@ -121,8 +121,12 @@ usersRouter
         req.app.get('db'),
         email,
       );
-      if (hasUserWithEmail)
-        return res.status(400).json({ error: 'Email is already being used' });
+      if (hasUserWithEmail){
+        if(hasUserWithEmail.email !== email){
+          return res.status(400).json({ error: 'Email is already being used' });
+        }
+
+      }
     }
 
     let hashedPassword;

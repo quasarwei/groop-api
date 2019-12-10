@@ -74,7 +74,7 @@ describe('Auth Endpoints', function() {
           subject: testUser.username,
           expiresIn: process.env.JWT_EXPIRY,
           algorithm: 'HS256',
-        },
+        }
       );
       return supertest(app)
         .post('/api/auth/login')
