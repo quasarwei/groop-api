@@ -1,32 +1,28 @@
 const app = require('../src/app.js');
 const helpers = require('./test-helpers');
 
-let testCategories = [
-  {
-    category_name: 'Test-category1',
-    group_id: 1,
-  },
-  {
-    category_name: 'Test-category2',
-    group_id: 1,
-  },
-  {
-    category_name: 'Test-category3',
-    group_id: 2,
-  },
-];
-
 describe.skip('Task-category Endpoints', () => {
   let db;
 
+  const {
+    testUsers,
+    testGroups,
+    testGroupsMembers,
+    testTasks,
+    testCategories,
+  } = helpers.makeAllFixtures();
+
+  const testUser = testUsers[0];
+  const testUser2 = testUsers[1];
+
   before('make knex instance', () => {
-    db = knex({ client: 'pg', connection: process.env.TEST_DATABASE_URL });
+    db = helpers.makeKnexInstance();
     app.set('db', db);
   });
 
   after('disconnect from db', () => db.destroy());
-  before('cleanup', () => db('groop_task_categories').truncate());
-  afterEach('cleanup', () => db('groop_task_categories').truncate());
+  before('cleanup', () => helpers.cleanTables(db));
+  afterEach('cleanup', () => helpers.cleanTables(db));
 
   describe('GET /api/categories', () => {
     context('Given no categories', () => {
