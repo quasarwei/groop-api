@@ -1,14 +1,22 @@
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Protected Endpoints', function() {
+describe.skip('Protected Endpoints', function() {
   let db;
 
-  const testUsers = helpers.makeUsersArray();
-  const testGroups = helpers.makeGroups();
-  const testGroupsMembers = helpers.makeGroupsMembers();
-  const testTasks = helpers.makeTasks();
-  const testCategories = helpers.makeTaskCategories();
+  // const testUsers = helpers.makeUsersArray();
+  // const testGroups = helpers.makeGroups();
+  // const testGroupsMembers = helpers.makeGroupsMembers();
+  // const testTasks = helpers.makeTasks();
+  // const testCategories = helpers.makeTaskCategories();
+
+  const {
+    testUsers,
+    testGroups,
+    testGroupsMembers,
+    testTasks,
+    testCategories,
+  } = helpers.makeAllFixtures();
 
   const [testUser] = testUsers;
 
