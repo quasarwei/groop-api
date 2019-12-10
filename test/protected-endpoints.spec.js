@@ -1,7 +1,7 @@
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.skip('Protected Endpoints', function() {
+describe('Protected Endpoints', function() {
   let db;
 
   const {
