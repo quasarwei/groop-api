@@ -1,5 +1,6 @@
 const app = require('../src/app');
 const helpers = require('./test-helpers');
+const bcrypt = require('bcryptjs');
 
 describe('users endpoints', function() {
   let db;
@@ -170,7 +171,8 @@ describe('users endpoints', function() {
           .post('/api/users')
           .send(newUser)
           .expect(res =>
-            db.from('user')
+            db
+              .from('groop_users')
               .select('*')
               .where({ id: res.body.id })
               .first()
@@ -182,7 +184,7 @@ describe('users endpoints', function() {
               })
               .then(compareMatch => {
                 expect(compareMatch).to.be.true;
-              })
+              }),
           );
       });
     });
@@ -194,8 +196,9 @@ describe('users endpoints', function() {
     it('responds 200 with serialized user with no password', () => {
       const updatedUser = {
         fullname: 'revised name',
-        email: 'newemail@email.com',
-        notifications: ''
+        email: testUser.email,
+        password: 'newPassword1!',
+        notifications: '',
       };
       return supertest(app)
         .patch('/api/users')
@@ -230,17 +233,15 @@ describe('users endpoints', function() {
     });
   });
 
-
   describe('POST /api/users/verify', () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
 
     it('responds 204', () => {
       return supertest(app)
         .post('/api/users/verify')
+        .send({ password: testUser.password })
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(204);
     });
   });
-
-
 });
