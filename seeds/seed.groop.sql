@@ -4,6 +4,7 @@ TRUNCATE groop_users RESTART IDENTITY CASCADE;
 TRUNCATE groop_groups RESTART IDENTITY CASCADE;
 TRUNCATE groop_groups_members RESTART IDENTITY CASCADE;
 TRUNCATE groop_tasks RESTART IDENTITY CASCADE;
+TRUNCATE groop_task_categories RESTART IDENTITY CASCADE;
 
 INSERT INTO groop_users (username, fullname, password, email, notifications)
 VALUES

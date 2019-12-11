@@ -76,6 +76,7 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
     group_id,
     category_id,
     priority,
+    user_assigned_id,
     time_start,
   } = req.body;
 
@@ -107,7 +108,6 @@ tasksRouter.post('/', requireAuth, jsonParser, async (req, res, next) => {
 
   const creator_id = req.user.id;
   //NOTE: a new task is assigned by default to the creator
-  const user_assigned_id = creator_id;
   const newTaskInfo = {
     name,
     description,
