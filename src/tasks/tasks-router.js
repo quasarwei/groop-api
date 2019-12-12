@@ -24,6 +24,9 @@ const taskFormat = task => ({
   category_id: task.category_id,
   priority: task.priority,
   time_start: task.time_start,
+  username: task.username,
+  category_name: task.category_name,
+  group_name: task.group_name,
 });
 
 // get all tasks that authorized user is assigned to
