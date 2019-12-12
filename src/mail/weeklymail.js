@@ -30,7 +30,15 @@ sendWeeklyMail = async () => {
           <div>
             <h4>${task.name}</h4>
             <p style="margin: 0 16px;">Description: ${task.description}</p>
-            <p style="margin: 0 16px;">Date Due: ${task.date_due}</p>
+            <p style="margin: 0 16px;">Date Due: ${new Date(
+              task.date_due,
+            ).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+            })}</p>
             <p style="margin: 0 16px;">Priority: ${
               task.priority === 1
                 ? 'low'

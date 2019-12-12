@@ -24,6 +24,9 @@ const taskFormat = task => ({
   category_id: task.category_id,
   priority: task.priority,
   time_start: task.time_start,
+  username: task.username,
+  category_name: task.category_name,
+  group_name: task.group_name,
 });
 
 // get all tasks that authorized user is assigned to
@@ -244,9 +247,27 @@ tasksRouter
             <h1>You've been assigned a task ${updatedTask.name}</h1>
             <div style="text-align: left;">
               <h4>${updatedTask.name}</h4>
-              <p style="margin: 0 16px;">Description: ${updatedTask.description}</p>
-              <p style="margin: 0 16px;">Date due: ${updatedTask.date_due}</p>
-              <p style="margin: 0 16px;">Start time: ${starttime}</p>
+              <p style="margin: 0 16px;">Description: ${
+                updatedTask.description
+              }</p>
+              <p style="margin: 0 16px;">Date due: ${new Date(
+                updatedTask.date_due,
+              ).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+              })}</p>
+              <p style="margin: 0 16px;">Start time: ${new Date(
+                starttime,
+              ).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+              })}</p>
               <p style="margin: 0 16px;">Priority: ${task_priority}</p>
               <p style="margin: 0 16px;">Group: ${groupname}</p>
             </div>
@@ -361,8 +382,24 @@ tasksRouter
                 <h1>The task ${updatedTask.name} has been updated</h1>
                 <div style="text-align: left;">
                   <p style="margin: 0 16px;">Description: ${updatedTask.description}</p>
-                  <p style="margin: 0 16px;">Date due: ${updatedTask.date_due}</p>
-                  <p style="margin: 0 16px;">Start time: ${starttime}</p>
+                  <p style="margin: 0 16px;">Date due: ${new Date(
+                updatedTask.date_due,
+              ).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+              })}</p>
+                  <p style="margin: 0 16px;">Start time: ${new Date(
+                    starttime
+              ).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+              })}</p>
                   <p style="margin: 0 16px;">Priority: ${task_priority}</p>
                   <p style="margin: 0 16px;">Group: ${groupname}</p>
                 </div>

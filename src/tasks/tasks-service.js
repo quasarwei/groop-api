@@ -8,9 +8,13 @@ const TasksService = {
       });
   },
   getGroupTasks(knex, group_id) {
-    return knex('groop_tasks')
-      .select('*')
-      .where('group_id', group_id);
+    return knex
+      .select('t.*', 'u.username', 'c.category_name', 'g.name as group_name')
+      .from('groop_tasks AS t')
+      .leftJoin('groop_users as u', 'u.id', 't.user_assigned_id')
+      .leftJoin('groop_task_categories as c', 'c.id', 't.category_id')
+      .leftJoin('groop_groups as g', 'g.id', 't.group_id')
+      .where('t.group_id', group_id);
   },
   getTaskById(knex, id) {
     return knex('groop_tasks')
@@ -19,8 +23,12 @@ const TasksService = {
       .first();
   },
   getTasksByAssignee(knex, user_assigned_id) {
-    return knex('groop_tasks')
-      .select('*')
+    return knex
+      .select('t.*', 'u.username', 'c.category_name', 'g.name as group_name')
+      .from('groop_tasks AS t')
+      .leftJoin('groop_users as u', 'u.id', 't.user_assigned_id')
+      .leftJoin('groop_task_categories as c', 'c.id', 't.category_id')
+      .leftJoin('groop_groups as g', 'g.id', 't.group_id')
       .where({ user_assigned_id });
   },
   updateTask(knex, task_id, updateInfo) {

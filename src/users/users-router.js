@@ -121,11 +121,14 @@ usersRouter
         req.app.get('db'),
         email,
       );
-      if (hasUserWithEmail){
-        if(hasUserWithEmail.email !== email){
+      if (hasUserWithEmail) {
+        const oldUserData = await UsersService.getUserByUsername(
+          req.app.get('db'),
+          req.user.username,
+        );
+        if (email !== oldUserData.email) {
           return res.status(400).json({ error: 'Email is already being used' });
         }
-
       }
     }
 
