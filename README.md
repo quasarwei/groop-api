@@ -1,5 +1,8 @@
 # Groop Server
 
+## Tech stack
+Node, Express, Knex, PostgreSQL, Mocha, Chai
+
 ## API Endpoints
 
 ### Overview
