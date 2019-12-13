@@ -1,5 +1,8 @@
 # Groop Server
 
+## Tech stack
+Node, Express, Knex, PostgreSQL, Mocha, Chai
+
 ## API Endpoints
 
 ### Overview
@@ -11,20 +14,21 @@
 | ------ | ------------------------------------------------------------------------------------ | --------------------------------------------- | ------------------------- | ------------- |
 | POST   | [/api/auth/token]                                                                    | Authenticate a user                           | JWT                       | JSON          |
 | PUT    | [/api/auth/token]                                                                    | Re-authenticate a user                        | JWT                       | A             |
-| POST   | [/api/users]                                                                         | Register a new user                           | User Object               | JSON          |
+| POST   | [/api/users](#post-apiusers)                                                         | Register a new user                           | User Object               | JSON          |
 | GET    | [/api/users](#get-apiusers)                                                          | Get account information for logged in user    | User Object               | A / JSON      |
-| PATCH  | [/api/users]                                                                         | Change account information for logged in user | User Object               | A / JSON      |
+| PATCH  | [/api/users](#patch-apiusers)                                                        | Change account information for logged in user | User Object               | A / JSON      |
+| POST   | [/api/users/verify](#post-apiusersverify)                                            | Verify password entered by user               | -                         | A             |
 | POST   | [/api/tasks](#post-apitasks)                                                         | Create a new task                             | New Task Object           | A / JSON      |
 | GET    | [/api/tasks](#get-apitasks)                                                          | Get all tasks user is assigned to             | Array of task objects     | A / JSON      |
 | GET    | [/api/tasks/:group_id](#get-apitasksgroup_id)                                        | Get all tasks in a group                      | Array of task objects     | A / JSON      |
 | PATCH  | [/api/tasks/task/:task_id](#patch-apitaskstasktask_id)                               | Edit a task                                   | Edited Task Object        | A / JSON      |
 | DELETE | [/api/tasks/task/:task_id](#delete-apitaskstasktask_id)                              | Delete a task                                 | -                         | A             |
-| POST   | [/api/categories]                                                                    | Create a task category in a group             | New Category Object       | A / JSON      |
+| POST   | [/api/categories](#post-apicategories)                                               | Create a task category in a group             | New Category Object       | A / JSON      |
 | GET    | [/api/categories/group/:group_id]                                                    | Get all task categories for a group           | Array of category objects | A / JSON      |
-| GET    | [/api/categories/:category_id]                                                       | Get a category by id                          | Category object           | A / JSON      |
+| GET    | [/api/categories/:category_id](#get-apicategoriescategory_id)                        | Get a category by id                          | Category object           | A / JSON      |
 | PATCH  | [/api/categories/:category_id]                                                       | Edit a category                               | Category object           | A / JSON      |
 | DELETE | [/api/categories/:category_id]                                                       | Delete a category                             | -                         | A             |
-| GET    | [/api/groups/:group_id]                                                              | Get a group                                   | Group Object              | A / JSON      |
+| GET    | [/api/groups/:group_id]                                                              | Get a group by id                             | Group Object              | A / JSON      |
 | POST   | [/api/groups](#post-apigroups)                                                       | Create a group                                | Object                    | A / JSON      |
 | DELETE | [/api/groups/:group_id](#delete-apigroupsgroup_id)                                   | Delete a group                                | -                         | A             |
 | POST   | [/api/groupsmembers](#post-apigroupsmembers)                                         | Add a user to a group                         | Object                    | A / JSON      |
@@ -46,9 +50,64 @@ Get account information for logged in user
 | email         | String | email associated with account |
 | notifications | Bool   | notification setting for user |
 
+#### `POST /api/users`
+
+Create a new user
+
+##### Request Body
+
+| Type     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| fullname | String | User's name                         |
+| username | String | User's username                     |
+| email    | String | email to be associated with account |
+| password | String | Password                            |
+
+#### `PATCH /api/users`
+
+Edit user account information
+
+##### Request Body
+
+| Type     | Type   | Description  |
+| -------- | ------ | ------------ |
+| fullname | String | New name     |
+| email    | String | New email    |
+| password | String | New password |
+
+#### `POST /api/users/verify`
+
+Verify password entered by user. Use with a patch call to /api/users to authorize any changes being made to account.
+Returns 204 if successful.
+
+##### Request Body
+
+| Type     | Type   | Description                             |
+| -------- | ------ | --------------------------------------- |
+| password | String | Password to verify with hashed password |
+
 #### `GET /api/tasks`
 
 Get all tasks the user is assigned to
+
+##### OK Response Body
+
+| Fields           | Type   | Description                                                               |
+| ---------------- | ------ | ------------------------------------------------------------------------- |
+| id               | Int    | task id                                                                   |
+| name             | String | Name of task                                                              |
+| description      | String | Description of task                                                       |
+| completed        | Bool   | Defaults to false                                                         |
+| creator_id       | Int    | id of user who submitted the task                                         |
+| date_due         | String | Date task is to be completed by                                           |
+| group_id         | Int    | group id task was created for                                             |
+| user_assigned_id | Int    | task's assignee's user id, defaults to null                               |
+| category_id      | Int    | id of category task belongs to                                            |
+| priority         | Int    | Priority level used for scoring purposes. (1 - Low, 2 - Medium, 3 - High) |
+| time_start       | String | optional start time for task                                              |
+| category_name    | String | category name of task                                                     |
+| group_name       | String | name of group task belongs to                                             |
+| username         | String | username of user assigned to task                                         |
 
 ##### OK Response Body
 
@@ -90,7 +149,26 @@ Submit a new task to a group
 
 #### `GET /api/tasks/:group_id`
 
-Get all tasks in a group
+Get all tasks in a group. Returns array of task objects.
+
+##### Task object
+
+| Fields           | Type   | Description                                                               |
+| ---------------- | ------ | ------------------------------------------------------------------------- |
+| id               | Int    | task id                                                                   |
+| name             | String | Name of task                                                              |
+| description      | String | Description of task                                                       |
+| completed        | Bool   | Defaults to false                                                         |
+| creator_id       | Int    | id of user who submitted the task                                         |
+| date_due         | String | Date task is to be completed by                                           |
+| group_id         | Int    | group id task was created for                                             |
+| user_assigned_id | Int    | task's assignee's user id, defaults to null                               |
+| category_id      | Int    | id of category task belongs to                                            |
+| priority         | Int    | Priority level used for scoring purposes. (1 - Low, 2 - Medium, 3 - High) |
+| time_start       | String | optional start time for task                                              |
+| category_name    | String | category name of task                                                     |
+| group_name       | String | name of group task belongs to                                             |
+| username         | String | username of user assigned to task                                         |
 
 ##### Path Parameter
 
@@ -152,6 +230,37 @@ Delete a task
 | ---- | ----------- |
 | 204  | No Content  |
 
+#### `POST /api/categories`
+
+Create a new category
+
+##### Request Body
+
+| Fields        | Type   | Description                       |
+| ------------- | ------ | --------------------------------- |
+| category_name | String | Name of new category              |
+| group_id      | Int    | Id of group to create category in |
+
+##### OK Response Body
+
+| Fields        | Type   | Description                         |
+| ------------- | ------ | ----------------------------------- |
+| id            | Int    | id of new category                  |
+| category_name | String | Name of new category                |
+| group_id      | Int    | Id of group category was created in |
+
+#### `GET /api/categories/:category_id`
+
+Get a category by ID
+
+##### OK Response Body
+
+| Fields        | Type   | Description                       |
+| ------------- | ------ | --------------------------------- |
+| id            | Int    | id of new category                |
+| category_name | String | Name of new category              |
+| group_id      | Int    | Id of group to create category in |
+
 #### `POST /api/groups`
 
 Create a new group
@@ -188,15 +297,24 @@ Add a member to a group
 
 ##### OK Response Body
 
-| Fields    | Type | Description      |
-| --------- | ---- | ---------------- |
-| id        | Int  | groupmember id   |
-| group_id  | Int  | Id of group      |
-| member_id | Int  | Id of new member |
+| Fields    | Type   | Description            |
+| --------- | ------ | ---------------------- |
+| id        | Int    | groupmember id         |
+| group_id  | Int    | Id of group            |
+| member_id | Int    | Id of new member       |
+| username  | String | username of new member |
+| score     | Int    | score of new member    |
 
 #### `GET /api/groupsmembers`
 
 Get all groups user is a part of
+
+##### OK Response Body
+
+| Fields   | Type   | Description   |
+| -------- | ------ | ------------- |
+| name     | String | Name of group |
+| group_id | Int    | Id of group   |
 
 #### `GET /api/groupsmembers/:group_id`
 
