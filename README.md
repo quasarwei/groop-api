@@ -1,6 +1,7 @@
 # Groop Server
 
 ## Tech stack
+
 Node, Express, Knex, PostgreSQL, Mocha, Chai
 
 ## API Endpoints
@@ -12,8 +13,8 @@ Node, Express, Knex, PostgreSQL, Mocha, Chai
 
 | Method | Endpoint                                                                             | Usage                                         | Returns                   | Header Fields |
 | ------ | ------------------------------------------------------------------------------------ | --------------------------------------------- | ------------------------- | ------------- |
-| POST   | [/api/auth/token]                                                                    | Authenticate a user                           | JWT                       | JSON          |
-| PUT    | [/api/auth/token]                                                                    | Re-authenticate a user                        | JWT                       | A             |
+| POST   | [/api/auth/token](#post-apiauthtoken)                                                | Authenticate a user                           | JWT                       | JSON          |
+| PUT    | /api/auth/token                                                                      | Re-authenticate a user                        | JWT                       | A / JSON      |
 | POST   | [/api/users](#post-apiusers)                                                         | Register a new user                           | User Object               | JSON          |
 | GET    | [/api/users](#get-apiusers)                                                          | Get account information for logged in user    | User Object               | A / JSON      |
 | PATCH  | [/api/users](#patch-apiusers)                                                        | Change account information for logged in user | User Object               | A / JSON      |
@@ -24,11 +25,11 @@ Node, Express, Knex, PostgreSQL, Mocha, Chai
 | PATCH  | [/api/tasks/task/:task_id](#patch-apitaskstasktask_id)                               | Edit a task                                   | Edited Task Object        | A / JSON      |
 | DELETE | [/api/tasks/task/:task_id](#delete-apitaskstasktask_id)                              | Delete a task                                 | -                         | A             |
 | POST   | [/api/categories](#post-apicategories)                                               | Create a task category in a group             | New Category Object       | A / JSON      |
-| GET    | [/api/categories/group/:group_id]                                                    | Get all task categories for a group           | Array of category objects | A / JSON      |
+| GET    | /api/categories/group/:group_id                                                      | Get all task categories for a group           | Array of category objects | A / JSON      |
 | GET    | [/api/categories/:category_id](#get-apicategoriescategory_id)                        | Get a category by id                          | Category object           | A / JSON      |
-| PATCH  | [/api/categories/:category_id]                                                       | Edit a category                               | Category object           | A / JSON      |
-| DELETE | [/api/categories/:category_id]                                                       | Delete a category                             | -                         | A             |
-| GET    | [/api/groups/:group_id]                                                              | Get a group by id                             | Group Object              | A / JSON      |
+| PATCH  | /api/categories/:category_id                                                         | Edit a category                               | Category object           | A / JSON      |
+| DELETE | /api/categories/:category_id                                                         | Delete a category                             | -                         | A             |
+| GET    | /api/groups/:group_id                                                                | Get a group by id                             | Group Object              | A / JSON      |
 | POST   | [/api/groups](#post-apigroups)                                                       | Create a group                                | Object                    | A / JSON      |
 | DELETE | [/api/groups/:group_id](#delete-apigroupsgroup_id)                                   | Delete a group                                | -                         | A             |
 | POST   | [/api/groupsmembers](#post-apigroupsmembers)                                         | Add a user to a group                         | Object                    | A / JSON      |
@@ -36,13 +37,30 @@ Node, Express, Knex, PostgreSQL, Mocha, Chai
 | GET    | [/api/groupsmembers/:group_id](#get-apigroupsmembersgroup_id)                        | Get all members in a group                    | Array of objects          | A / JSON      |
 | DELETE | [/api/groupsmembers/:group_id/:member_id](#delete-apigroupsmembersgroup_idmember_id) | Remove a user from a group                    | -                         | A             |
 
+#### `POST /api/auth/token`
+
+Login
+
+##### Request Body
+
+| Field    | Type   | Description |
+| -------- | ------ | ----------- |
+| username | String | username    |
+| password | String | Password    |
+
+##### OK Response Body
+
+| Field     | Type   | Description |
+| --------- | ------ | ----------- |
+| authToken | String | JWT         |
+
 #### `GET /api/users`
 
 Get account information for logged in user
 
 ##### OK Response Body
 
-| Type          | Type   | Description                   |
+| Field         | Type   | Description                   |
 | ------------- | ------ | ----------------------------- |
 | id            | Int    | Unique user ID                |
 | fullname      | String | User's name                   |
@@ -56,7 +74,7 @@ Create a new user
 
 ##### Request Body
 
-| Type     | Type   | Description                         |
+| Field    | Type   | Description                         |
 | -------- | ------ | ----------------------------------- |
 | fullname | String | User's name                         |
 | username | String | User's username                     |
@@ -69,7 +87,7 @@ Edit user account information
 
 ##### Request Body
 
-| Type     | Type   | Description  |
+| Field    | Type   | Description  |
 | -------- | ------ | ------------ |
 | fullname | String | New name     |
 | email    | String | New email    |
@@ -82,7 +100,7 @@ Returns 204 if successful.
 
 ##### Request Body
 
-| Type     | Type   | Description                             |
+| Field    | Type   | Description                             |
 | -------- | ------ | --------------------------------------- |
 | password | String | Password to verify with hashed password |
 
@@ -92,7 +110,7 @@ Get all tasks the user is assigned to
 
 ##### OK Response Body
 
-| Fields           | Type   | Description                                                               |
+| Field            | Type   | Description                                                               |
 | ---------------- | ------ | ------------------------------------------------------------------------- |
 | id               | Int    | task id                                                                   |
 | name             | String | Name of task                                                              |
@@ -121,7 +139,7 @@ Submit a new task to a group
 
 ##### Request Body
 
-| Fields      | Type   | Description                                                               | Required? |
+| Field       | Type   | Description                                                               | Required? |
 | ----------- | ------ | ------------------------------------------------------------------------- | --------- |
 | name        | String | Name of task                                                              | Y         |
 | description | String | Description of task                                                       | N         |
@@ -133,7 +151,7 @@ Submit a new task to a group
 
 ##### OK Response Body
 
-| Fields           | Type   | Description                                                               |
+| Field            | Type   | Description                                                               |
 | ---------------- | ------ | ------------------------------------------------------------------------- |
 | id               | Int    | task id                                                                   |
 | name             | String | Name of task                                                              |
@@ -153,7 +171,7 @@ Get all tasks in a group. Returns array of task objects.
 
 ##### Task object
 
-| Fields           | Type   | Description                                                               |
+| Field            | Type   | Description                                                               |
 | ---------------- | ------ | ------------------------------------------------------------------------- |
 | id               | Int    | task id                                                                   |
 | name             | String | Name of task                                                              |
@@ -196,7 +214,7 @@ Edit a task
 
 Body must include at least one item to edit:
 
-| Fields           | Type   | Description                              |
+| Field            | Type   | Description                              |
 | ---------------- | ------ | ---------------------------------------- |
 | name             | String | Name of task                             |
 | description      | String | Description of task                      |
@@ -236,14 +254,14 @@ Create a new category
 
 ##### Request Body
 
-| Fields        | Type   | Description                       |
+| Field         | Type   | Description                       |
 | ------------- | ------ | --------------------------------- |
 | category_name | String | Name of new category              |
 | group_id      | Int    | Id of group to create category in |
 
 ##### OK Response Body
 
-| Fields        | Type   | Description                         |
+| Field         | Type   | Description                         |
 | ------------- | ------ | ----------------------------------- |
 | id            | Int    | id of new category                  |
 | category_name | String | Name of new category                |
@@ -255,7 +273,7 @@ Get a category by ID
 
 ##### OK Response Body
 
-| Fields        | Type   | Description                       |
+| Field         | Type   | Description                       |
 | ------------- | ------ | --------------------------------- |
 | id            | Int    | id of new category                |
 | category_name | String | Name of new category              |
@@ -267,13 +285,13 @@ Create a new group
 
 ##### Request Body
 
-| Fields | Type   | Description   |
-| ------ | ------ | ------------- |
-| name   | String | Name of group |
+| Field | Type   | Description   |
+| ----- | ------ | ------------- |
+| name  | String | Name of group |
 
 ##### OK Response Body
 
-| Fields   | Type   | Description         |
+| Field    | Type   | Description         |
 | -------- | ------ | ------------------- |
 | id       | Int    | task id             |
 | name     | String | Name of group       |
@@ -290,14 +308,14 @@ Add a member to a group
 
 ##### Request Body
 
-| Fields    | Type | Description      |
+| Field     | Type | Description      |
 | --------- | ---- | ---------------- |
 | group_id  | Int  | Id of group      |
 | member_id | Int  | Id of new member |
 
 ##### OK Response Body
 
-| Fields    | Type   | Description            |
+| Field     | Type   | Description            |
 | --------- | ------ | ---------------------- |
 | id        | Int    | groupmember id         |
 | group_id  | Int    | Id of group            |
@@ -311,7 +329,7 @@ Get all groups user is a part of
 
 ##### OK Response Body
 
-| Fields   | Type   | Description   |
+| Field    | Type   | Description   |
 | -------- | ------ | ------------- |
 | name     | String | Name of group |
 | group_id | Int    | Id of group   |
@@ -323,7 +341,7 @@ Returns an array of objects containing member information
 
 ##### OK Response Object
 
-| Fields        | Type   | Description                         |
+| Field         | Type   | Description                         |
 | ------------- | ------ | ----------------------------------- |
 | member_id     | Int    | member id                           |
 | score         | Int    | member's score for the group        |
